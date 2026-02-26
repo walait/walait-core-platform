@@ -1,9 +1,9 @@
+import { Roles } from '@/modules/access/interfaces/decorators/role.decorator';
 import type { IUserRequest } from '@/modules/identity/domain/user.interface';
 import { JwtAuthGuard } from '@/modules/identity/interfaces/guards/jwt.guard';
 import { Controller, Get, Req, UseGuards, UsePipes } from '@nestjs/common';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { Roles } from '../../../../access-ms/modules/role/decorator/role.decorator';
-import type { AdminService } from '../services/admin.service';
+import type { AdminService } from '../../application/admin.service';
 
 @UsePipes(ZodValidationPipe)
 @Controller('admin')
