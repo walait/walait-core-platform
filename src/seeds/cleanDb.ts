@@ -1,6 +1,6 @@
 import 'reflect-metadata';
+import { UserRole } from '@/modules/access/domain/model/user-role.entity';
 import { EmailVerificationToken } from '@/modules/email/domain/model/email-verification-token.entity';
-import { UserRole } from '@/services/access-ms/modules/user-roles/model/user-role.entity';
 import { Session } from '@/services/identity-ms/modules/session/model/session.entity';
 import { User } from '@/services/identity-ms/modules/user/model/user.entity';
 import { config } from 'dotenv';

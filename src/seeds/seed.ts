@@ -1,11 +1,11 @@
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
+import { Permission } from '@/modules/access/domain/model/permission.entity';
+import { RolePermission } from '@/modules/access/domain/model/role-permission.entity';
+import { Role } from '@/modules/access/domain/model/role.entity';
+import type { RoleType } from '@/modules/access/domain/types/role.type';
+import type { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
 import { config } from 'dotenv';
-import { Permission } from '@/services/access-ms/modules/permission/model/permission.entity';
-import { RolePermission } from '@/services/access-ms/modules/role-permission/model/role-permission.entity';
-import { Role } from '@/services/access-ms/modules/role/model/role.entity';
-import { RoleType } from '@/services/access-ms/modules/role/types/role.type';
-import { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
+import { DataSource } from 'typeorm';
 
 config({ path: '.env' }); // Load env variables
 

@@ -1,9 +1,9 @@
+import { AccessModule } from '@/modules/access/access.module';
 import { Module } from '@nestjs/common';
-import { UserController } from './controller/user.controller';
-import { UserService } from './services/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserController } from './controller/user.controller';
 import { User } from './model/user.entity';
-import { AccessModule } from '@/services/access-ms/access.module';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User]), AccessModule],

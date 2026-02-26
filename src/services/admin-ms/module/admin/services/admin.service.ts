@@ -1,6 +1,6 @@
-import { RoleHierarchy } from '@/services/access-ms/modules/role/constants/role-hierarchy.constant';
+import { RoleHierarchy } from '@/modules/access/domain/constants/role-hierarchy.constant';
 import { Inject, Injectable } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import type { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
