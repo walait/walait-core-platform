@@ -7,8 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { IdentityModule } from './modules/identity/identity.module';
 import { TaxesModule } from './modules/taxes/taxes.module';
-import { IdentityModule } from './services/identity-ms/identity.module';
 import { getTypeOrmConfig } from './shared/database/typeorm.config';
 import { EventBusModule } from './shared/event-bus/event-bus.module';
 
