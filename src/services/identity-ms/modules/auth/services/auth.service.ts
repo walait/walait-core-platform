@@ -1,42 +1,52 @@
-import { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
+import { EmailTemplate } from '@/modules/email/domain/email.enum';
+import type { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
+import { Organization } from '@/services/organization-ms/modules/orgnanization/model/organization.entity';
 import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
+  Body,
   ConflictException,
   ForbiddenException,
-  UnprocessableEntityException,
+  Inject,
+  Injectable,
+  NotFoundException,
   Post,
-  Body,
   Query,
   Req,
-  Inject,
+  UnauthorizedException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
+import { ConfigService as ConfigServiceToken } from '@nestjs/config';
+import type { ConfigService } from '@nestjs/config';
+import type { ClientProxy } from '@nestjs/microservices';
 import { hash } from 'argon2';
-import { SessionService } from '../../session/services/session.service';
-import { TokenService } from '../../token/services/token.service';
-import { UserService } from '../../user/services/user.service';
-
-import { PasswordService } from '../../password/services/password.service';
-import { DataSource, EntityManager } from 'typeorm';
-
-import { SignInInput, SignUpInput } from '../schemas/auth.schema';
-import { Session } from '../../session/model/session.entity';
-import { User } from '../../user/model/user.entity';
-import { ConfigService } from '@nestjs/config';
-import { Organization } from '@/services/organization-ms/modules/orgnanization/model/organization.entity';
-import { EmailTemplate } from '@/services/email-ms/modules/email/enum/email.enum';
-import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { DataSource as DataSourceToken } from 'typeorm';
+import type { DataSource } from 'typeorm';
+import { PasswordService as PasswordServiceToken } from '../../password/services/password.service';
+import type { PasswordService } from '../../password/services/password.service';
+import type { Session } from '../../session/model/session.entity';
+import { SessionService as SessionServiceToken } from '../../session/services/session.service';
+import type { SessionService } from '../../session/services/session.service';
+import { TokenService as TokenServiceToken } from '../../token/services/token.service';
+import type { TokenService } from '../../token/services/token.service';
+import type { User } from '../../user/model/user.entity';
+import { UserService as UserServiceToken } from '../../user/services/user.service';
+import type { UserService } from '../../user/services/user.service';
+import type { SignInInput, SignUpInput } from '../schemas/auth.schema';
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(DataSourceToken)
     private readonly dataSource: DataSource,
+    @Inject(UserServiceToken)
     private readonly userService: UserService,
+    @Inject(SessionServiceToken)
     private readonly sessionService: SessionService,
+    @Inject(TokenServiceToken)
     private readonly tokenService: TokenService,
+    @Inject(PasswordServiceToken)
     private readonly passwordService: PasswordService,
     @Inject('EVENT_BUS') private client: ClientProxy,
+    @Inject(ConfigServiceToken)
     private readonly configService: ConfigService,
   ) {}
 

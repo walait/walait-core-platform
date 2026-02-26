@@ -1,13 +1,13 @@
 import {
   ConflictException,
-  NotFoundException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
-import { EmailService } from '../modules/email/services/email.service';
-import { VerificationService } from '../modules/verification/services/verification.service';
-import { EmailVerificationToken } from '../modules/verification/model/email-verification-token.entity';
+import type { EmailService } from '../../application/email.service';
+import type { VerificationService } from '../../application/verification.service';
+import type { EmailVerificationToken } from '../../domain/model/email-verification-token.entity';
 
 type GetTokenEvent = {
   token: string;

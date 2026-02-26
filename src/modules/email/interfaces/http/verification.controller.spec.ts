@@ -3,7 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { VerificationService } from '../services/verification.service';
+import { VerificationService } from '../../application/verification.service';
 import { VerificationController } from './verification.controller';
 
 describe('VerificationController', () => {

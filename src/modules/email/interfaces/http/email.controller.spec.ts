@@ -1,6 +1,6 @@
 import { Test, type TestingModule } from '@nestjs/testing';
 import { vi } from 'vitest';
-import { EmailService } from '../services/email.service';
+import { EmailService } from '../../application/email.service';
 import { EmailController } from './email.controller';
 
 describe('EmailController', () => {

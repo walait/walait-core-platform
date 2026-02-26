@@ -1,10 +1,10 @@
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
-import { config } from 'dotenv';
-import { User } from '@/services/identity-ms/modules/user/model/user.entity';
-import { Session } from '@/services/identity-ms/modules/session/model/session.entity';
+import { EmailVerificationToken } from '@/modules/email/domain/model/email-verification-token.entity';
 import { UserRole } from '@/services/access-ms/modules/user-roles/model/user-role.entity';
-import { EmailVerificationToken } from '@/services/email-ms/modules/verification/model/email-verification-token.entity';
+import { Session } from '@/services/identity-ms/modules/session/model/session.entity';
+import { User } from '@/services/identity-ms/modules/user/model/user.entity';
+import { config } from 'dotenv';
+import { DataSource } from 'typeorm';
 
 config({ path: '.env' }); // Load env variables
 

@@ -1,11 +1,11 @@
-import { Controller, Post, UsePipes } from '@nestjs/common';
+import { Controller, Inject, Post, UsePipes } from '@nestjs/common';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { EmailService } from '../services/email.service';
+import { EmailService } from '../../application/email.service';
 
 @UsePipes(ZodValidationPipe)
 @Controller('email-ms')
 export class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(@Inject(EmailService) private readonly emailService: EmailService) {}
 
   @Post('syncronize')
   async syncronizeTemplate() {

@@ -1,13 +1,13 @@
+import { EmailModule } from '@/modules/email/email.module';
 import { Module } from '@nestjs/common';
-import { AuthModule } from './modules/auth/auth.module';
-import { SessionModule } from './modules/session/session.module';
-import { PasswordModule } from './modules/password/password.module';
-import { UserModule } from './modules/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
-import { TokenModule } from './modules/token/token.module';
-import { EmailModule } from '../email-ms/email.module';
-import { UserRqmListener } from './listeners/user.listener';
 import { SessionRmqListener } from './listeners/session.listener';
+import { UserRqmListener } from './listeners/user.listener';
+import { AuthModule } from './modules/auth/auth.module';
+import { PasswordModule } from './modules/password/password.module';
+import { SessionModule } from './modules/session/session.module';
+import { TokenModule } from './modules/token/token.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [

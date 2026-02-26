@@ -9,6 +9,7 @@ export const getTypeOrmConfig = (configService: ConfigService): DataSourceOption
     url: configService.get<string>('DATABASE_URL'),
     entities: [
       __dirname + '/../../services/**/modules/**/model/*.entity.{ts,js}',
+      __dirname + '/../../modules/**/domain/model/*.entity.{ts,js}',
       __dirname + '/../../modules/taxes/infrastructure/**/*.entity.{ts,js}',
     ],
     synchronize: false, // true solo en desarrollo, cuidado en prod

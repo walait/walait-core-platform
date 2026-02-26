@@ -12,18 +12,19 @@ import {
 } from '@nestjs/common';
 
 import { JwtAuthGuard } from '@/services/identity-ms/guards/jwt.guard';
-import { OrganizationService } from '@/services/organization-ms/modules/orgnanization/services/organization.service';
-import { VerificationService } from '../services/verification.service';
 import { TokenService } from '@/services/identity-ms/modules/token/services/token.service';
+import type { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
 import { UserService } from '@/services/identity-ms/modules/user/services/user.service';
+import { OrganizationService } from '@/services/organization-ms/modules/orgnanization/services/organization.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
-import { ClientProxy } from '@nestjs/microservices';
-import { string } from 'zod';
+import type { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
+import { string } from 'zod';
+import { VerificationService } from '../../application/verification.service';
 @Controller('email-verification-ms')
 export class VerificationController {
   constructor(
+    @Inject(VerificationService)
     private readonly vericationService: VerificationService,
     @Inject('EVENT_BUS') private client: ClientProxy,
   ) {}

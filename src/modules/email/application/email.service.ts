@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import axios, { AxiosInstance } from 'axios';
-import { BreveEmailTemplateSchema, BrevoEmailTemplate } from '../schemas/breve.schema';
+import type { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EmailEntity } from '../model/email.entity';
-import { Repository } from 'typeorm';
+import axios, { type AxiosInstance } from 'axios';
+import type { Repository } from 'typeorm';
+import { EmailEntity } from '../domain/model/email.entity';
+import {
+  BreveEmailTemplateSchema,
+  type BrevoEmailTemplate,
+} from '../interfaces/http/schemas/breve.schema';
 
 @Injectable()
 export class EmailService {
@@ -49,14 +52,12 @@ export class EmailService {
     );
     if (response.status === 200) {
       console.log('Email templates fetched successfully.');
-      const data: BrevoEmailTemplate[] = response.data.templates.map((template: any) =>
+      return response.data.templates.map((template: unknown) =>
         BreveEmailTemplateSchema.parse(template),
       );
-      return data;
-    } else {
-      console.error('Failed to fetch email templates:', response.statusText);
-      throw new Error('Failed to fetch email templates');
     }
+    console.error('Failed to fetch email templates:', response.statusText);
+    throw new Error('Failed to fetch email templates');
   }
 
   async getTemplateBySlug(templateSlug: string) {
@@ -68,17 +69,16 @@ export class EmailService {
     if (template) {
       console.log(`Template found: ${template.slug}`);
       return template;
-    } else {
-      console.error(`Template not found: ${templateSlug}`);
-      throw new Error(`Template not found: ${templateSlug}`);
     }
+    console.error(`Template not found: ${templateSlug}`);
+    throw new Error(`Template not found: ${templateSlug}`);
   }
 
   async sendEmailWithTemplate(
     emailEntity: EmailEntity,
     to: string,
     subject: string,
-    variables: Record<string, any>,
+    variables: Record<string, unknown>,
   ): Promise<void> {
     // Logic to send an email using a specific template
     console.log(`Sending email to ${to} with template ${emailEntity.slug}`);
@@ -135,10 +135,9 @@ export class EmailService {
     if (response.status === 200) {
       console.log('Email template fetched successfully.');
       return BreveEmailTemplateSchema.parse(response.data);
-    } else {
-      console.error('Failed to fetch email template:', response.statusText);
-      throw new Error('Failed to fetch email template');
     }
+    console.error('Failed to fetch email template:', response.statusText);
+    throw new Error('Failed to fetch email template');
   }
 
   sendEmail(to: string, subject: string, body: string): void {

@@ -1,9 +1,9 @@
+import { Injectable } from '@nestjs/common';
+import type { ConfigService } from '@nestjs/config';
 // email-ms/listeners/email-verification.listener.ts
 import { MessagePattern } from '@nestjs/microservices';
-import { Injectable } from '@nestjs/common';
-import { EmailService } from '../../email/services/email.service';
-import { VerificationService } from '../services/verification.service';
-import { ConfigService } from '@nestjs/config';
+import type { EmailService } from '../../application/email.service';
+import type { VerificationService } from '../../application/verification.service';
 
 type EmailVerificatiMessagePattern = {
   user_id: string;
