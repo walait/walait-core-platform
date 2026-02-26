@@ -1,6 +1,6 @@
 // apps/core/entities/organization.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
-import { Membership } from '../../membership/model/membership.entity';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Membership } from './membership.entity';
 
 @Entity('organizations')
 export class Organization {
@@ -19,7 +19,10 @@ export class Organization {
   @Column({ default: true })
   is_active: boolean;
 
-  @OneToMany(() => Membership, (m) => m.organization)
+  @OneToMany(
+    () => Membership,
+    (m) => m.organization,
+  )
   memberships: Membership[];
 
   @Column({ nullable: true })

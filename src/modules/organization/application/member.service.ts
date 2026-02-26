@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { EntityManager, Repository } from 'typeorm';
-import { Membership } from '../model/membership.entity';
+import { EntityManager, type Repository } from 'typeorm';
+import { Membership } from '../domain/model/membership.entity';
 
 @Injectable()
 export class MemberService {

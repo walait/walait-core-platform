@@ -1,4 +1,4 @@
-import type { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
+import type { ScopeType } from '@/modules/organization/domain/types/scope.type';
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import type { RoleType } from '../types/role.type';
 import type { Permission } from './permission.entity';

@@ -1,4 +1,4 @@
-import type { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
+import type { ScopeType } from '@/modules/organization/domain/types/scope.type';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';

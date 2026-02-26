@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
-import { OrganizationService } from '../modules/orgnanization/services/organization.service';
+import type { OrganizationService } from '../../application/organization.service';
 
 @Controller()
 export class OrganizationRmqListener {

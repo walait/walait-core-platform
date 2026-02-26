@@ -1,4 +1,4 @@
-import type { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
+import type { ScopeType } from '@/modules/organization/domain/types/scope.type';
 import { NotFoundException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';

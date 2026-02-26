@@ -1,5 +1,5 @@
 import { EmailTemplate } from '@/modules/email/domain/email.enum';
-import { Organization } from '@/services/organization-ms/modules/orgnanization/model/organization.entity';
+import { Organization } from '@/modules/organization/domain/model/organization.entity';
 import {
   Body,
   ConflictException,

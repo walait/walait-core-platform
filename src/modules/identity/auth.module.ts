@@ -1,4 +1,4 @@
-import { OrganizationModule } from '@/services/organization-ms/app.module';
+import { OrganizationModule } from '@/modules/organization/organization.module';
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { AuthService } from './application/auth.service';

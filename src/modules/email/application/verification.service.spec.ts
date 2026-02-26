@@ -105,9 +105,12 @@ describe('EmailVerificationService', () => {
 
   describe('deleteExpiredTokens', () => {
     it('should delete all expired tokens', async () => {
-      const now = new Date();
+      const now = new Date('2026-02-26T00:00:00.000Z');
+      vi.useFakeTimers();
+      vi.setSystemTime(now);
       await service.deleteExpiredTokens();
       expect(repo.delete).toHaveBeenCalledWith({ expires_at: LessThan(now) });
+      vi.useRealTimers();
     });
   });
 

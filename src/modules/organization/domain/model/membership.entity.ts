@@ -1,13 +1,13 @@
 // apps/core/entities/membership.entity.ts
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
   CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Organization } from '../../orgnanization/model/organization.entity';
+import { Organization } from './organization.entity';
 
 @Entity('organization_memberships')
 export class Membership {

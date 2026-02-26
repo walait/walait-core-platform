@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OrganizationService } from './organization.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Organization } from '../model/organization.entity';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { Test, type TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
+import { Organization } from '../domain/model/organization.entity';
+import { OrganizationService } from './organization.service';
 
 describe('OrganizationService', () => {
   let service: OrganizationService;

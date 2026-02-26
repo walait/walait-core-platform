@@ -3,7 +3,7 @@ import { Permission } from '@/modules/access/domain/model/permission.entity';
 import { RolePermission } from '@/modules/access/domain/model/role-permission.entity';
 import { Role } from '@/modules/access/domain/model/role.entity';
 import type { RoleType } from '@/modules/access/domain/types/role.type';
-import type { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
+import type { ScopeType } from '@/modules/organization/domain/types/scope.type';
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 

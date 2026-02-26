@@ -1,9 +1,9 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { Organization } from '../model/organization.entity';
-import { Repository } from 'typeorm';
-import { OrganizationType } from '../schemas/organization.schema';
+import type { Repository } from 'typeorm';
+import { Organization } from '../domain/model/organization.entity';
+import type { OrganizationType } from '../interfaces/schemas/organization.schema';
 @Injectable()
 export class OrganizationService {
   constructor(

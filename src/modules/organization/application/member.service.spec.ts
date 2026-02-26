@@ -3,7 +3,7 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import { type Mock, vi } from 'vitest';
-import { Membership } from '../model/membership.entity';
+import { Membership } from '../domain/model/membership.entity';
 import { MemberService } from './member.service';
 
 // Utilidad para crear mocks de repositorio TypeORM

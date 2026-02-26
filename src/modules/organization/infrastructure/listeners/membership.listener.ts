@@ -2,8 +2,8 @@ import type { RoleType } from '@/modules/access/domain/types/role.type';
 // src/services/organization-ms/listeners/membership.rmq.ts
 import { Controller } from '@nestjs/common';
 import { Ctx, MessagePattern, Payload, RmqContext } from '@nestjs/microservices';
-import type { MemberService } from '../modules/membership/services/member.service';
-import type { Organization } from '../modules/orgnanization/model/organization.entity';
+import type { MemberService } from '../../application/member.service';
+import type { Organization } from '../../domain/model/organization.entity';
 
 type CreateMembership = {
   user_id: string;

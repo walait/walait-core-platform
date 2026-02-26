@@ -1,6 +1,6 @@
 import type { User } from '@/modules/identity/domain/model/user.entity';
-import type { Membership } from '@/services/organization-ms/modules/membership/model/membership.entity';
-import type { Organization } from '@/services/organization-ms/modules/orgnanization/model/organization.entity';
+import type { Membership } from '@/modules/organization/domain/model/membership.entity';
+import type { Organization } from '@/modules/organization/domain/model/organization.entity';
 import { Injectable } from '@nestjs/common';
 import type { EntityManager } from 'typeorm';
 import type { UserRole } from '../domain/model/user-role.entity';
