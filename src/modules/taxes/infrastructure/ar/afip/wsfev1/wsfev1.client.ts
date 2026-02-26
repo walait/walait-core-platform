@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
-import axios from "axios";
+
 import { XMLParser } from "fast-xml-parser";
+import axios from "axios";
 
 @Injectable()
 export class Wsfev1Client {

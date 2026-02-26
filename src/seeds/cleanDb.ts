@@ -1,17 +1,18 @@
-import 'reflect-metadata';
-import { UserRole } from '@/modules/access/domain/model/user-role.entity';
-import { EmailVerificationToken } from '@/modules/email/domain/model/email-verification-token.entity';
-import { Session } from '@/modules/identity/domain/model/session.entity';
-import { User } from '@/modules/identity/domain/model/user.entity';
-import { config } from 'dotenv';
-import { DataSource } from 'typeorm';
+import "reflect-metadata";
 
-config({ path: '.env' }); // Load env variables
+import { DataSource } from "typeorm";
+import { EmailVerificationToken } from "@/modules/email/domain/model/email-verification-token.entity";
+import { Session } from "@/modules/identity/domain/model/session.entity";
+import { User } from "@/modules/identity/domain/model/user.entity";
+import { UserRole } from "@/modules/access/domain/model/user-role.entity";
+import { config } from "dotenv";
+
+config({ path: ".env" }); // Load env variables
 
 const AppDataSource = new DataSource({
-  type: 'postgres',
+  type: "postgres",
   url: process.env.DATABASE_URL,
-  entities: ['src/services/**/modules/**/model/*.entity.{ts,js}'],
+  entities: ["src/services/**/modules/**/model/*.entity.{ts,js}"],
   synchronize: true,
   logging: true,
 });
@@ -32,9 +33,9 @@ async function seed() {
 
 seed()
   .then(() => {
-    console.log('✅ Seed complete');
+    console.log("✅ Seed complete");
   })
   .catch((err) => {
-    console.error('❌ Error during seed:', err);
+    console.error("❌ Error during seed:", err);
     AppDataSource.destroy();
   });
