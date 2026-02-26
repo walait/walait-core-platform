@@ -1,4 +1,4 @@
-import { User } from '@/services/identity-ms/modules/user/model/user.entity';
+import { User } from '@/modules/identity/domain/model/user.entity';
 import { Organization } from '@/services/organization-ms/modules/orgnanization/model/organization.entity';
 import type { ScopeType } from '@/services/organization-ms/modules/orgnanization/types/scope.type';
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';

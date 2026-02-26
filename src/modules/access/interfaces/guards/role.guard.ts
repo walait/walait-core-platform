@@ -1,4 +1,4 @@
-import type { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
+import type { IUserRequest } from '@/modules/identity/domain/user.interface';
 import {
   type CanActivate,
   type ExecutionContext,

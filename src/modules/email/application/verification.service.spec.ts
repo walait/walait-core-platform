@@ -1,9 +1,9 @@
+import type { User } from '@/modules/identity/domain/model/user.entity';
 import { NotFoundException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { LessThan, type Repository } from 'typeorm';
 import { type Mock, vi } from 'vitest';
-import type { User } from '../../identity-ms/modules/user/model/user.entity';
 import { EmailVerificationToken } from '../domain/model/email-verification-token.entity';
 import { VerificationService } from './verification.service';
 

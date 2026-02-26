@@ -11,10 +11,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import { JwtAuthGuard } from '@/services/identity-ms/guards/jwt.guard';
-import { TokenService } from '@/services/identity-ms/modules/token/services/token.service';
-import type { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
-import { UserService } from '@/services/identity-ms/modules/user/services/user.service';
+import { TokenService } from '@/modules/identity/application/token.service';
+import { UserService } from '@/modules/identity/application/user.service';
+import type { IUserRequest } from '@/modules/identity/domain/user.interface';
+import { JwtAuthGuard } from '@/modules/identity/interfaces/guards/jwt.guard';
 import { OrganizationService } from '@/services/organization-ms/modules/orgnanization/services/organization.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import type { ClientProxy } from '@nestjs/microservices';

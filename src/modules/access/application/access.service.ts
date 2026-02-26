@@ -1,4 +1,4 @@
-import type { User } from '@/services/identity-ms/modules/user/model/user.entity';
+import type { User } from '@/modules/identity/domain/model/user.entity';
 import type { Membership } from '@/services/organization-ms/modules/membership/model/membership.entity';
 import type { Organization } from '@/services/organization-ms/modules/orgnanization/model/organization.entity';
 import { Injectable } from '@nestjs/common';

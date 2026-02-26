@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from '@/services/identity-ms/guards/jwt.guard';
+import { JwtAuthGuard } from '@/modules/identity/interfaces/guards/jwt.guard';
 import { BadRequestException } from '@nestjs/common';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';

@@ -1,4 +1,4 @@
-import type { IUserRequest } from '@/services/identity-ms/modules/user/model/user.interface';
+import type { IUserRequest } from '@/modules/identity/domain/user.interface';
 import { ForbiddenException } from '@nestjs/common';
 import type { Reflector } from '@nestjs/core';
 import { vi } from 'vitest';

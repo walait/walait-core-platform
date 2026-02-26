@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { UserRole } from '@/modules/access/domain/model/user-role.entity';
 import { EmailVerificationToken } from '@/modules/email/domain/model/email-verification-token.entity';
-import { Session } from '@/services/identity-ms/modules/session/model/session.entity';
-import { User } from '@/services/identity-ms/modules/user/model/user.entity';
+import { Session } from '@/modules/identity/domain/model/session.entity';
+import { User } from '@/modules/identity/domain/model/user.entity';
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 
