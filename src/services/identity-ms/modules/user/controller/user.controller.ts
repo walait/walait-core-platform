@@ -16,19 +16,19 @@ import {
 import { ZodValidationPipe } from 'nestjs-zod';
 
 import { JwtAuthGuard } from '@/services/identity-ms/guards/jwt.guard';
-import { UserService } from '../services/user.service';
-import { PermissionService } from '@/services/access-ms/modules/permission/services/permission.service';
-import { SignUpInput } from '../../auth/schemas/auth.schema';
-import { UserRoleService } from '@/services/access-ms/modules/user-roles/services/user-role.service';
-import { IUserRequest } from '../model/user.interface';
-import { Request } from 'express';
-import { ClientProxy } from '@nestjs/microservices';
+import type { ClientProxy } from '@nestjs/microservices';
+import type { Request } from 'express';
 import { firstValueFrom } from 'rxjs';
+import type { SignUpInput } from '../../auth/schemas/auth.schema';
+import type { IUserRequest } from '../model/user.interface';
+import { UserService as UserServiceToken } from '../services/user.service';
+import type { UserService } from '../services/user.service';
 
 @UsePipes(ZodValidationPipe)
 @Controller('user')
 export class UserController {
   constructor(
+    @Inject(UserServiceToken)
     private readonly userService: UserService,
     @Inject('EVENT_BUS') private client: ClientProxy,
   ) {}
