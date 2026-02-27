@@ -95,6 +95,13 @@ Notas de produccion:
 - La idempotencia es in-memory con TTL (6h) y no persiste reinicios.
 - Sugerencia de deploy: Render, Railway o AWS.
 
+### Railway
+
+- Railway expone una URL publica. Usa esa URL como webhook en Meta.
+- El servidor debe escuchar en `0.0.0.0:$PORT` (configurado por defecto con `HOST=0.0.0.0`).
+- Webhook: `https://<tu-app>.up.railway.app/webhook`.
+
+
 Build:
 
 ```
