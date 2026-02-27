@@ -4,8 +4,9 @@ import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { ConfigService } from '@nestjs/config';
 // src/apps/auth/auth.controller.spec.ts
 import { Test, type TestingModule } from '@nestjs/testing';
-import type { Request, Response } from 'express';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { vi } from 'vitest';
+import type { SignUpInput } from '../schemas/auth.schema';
 import { AuthController } from './auth.controller';
 
 // ──────────────────────────────────────────────────
@@ -52,23 +53,19 @@ describe('AuthController', () => {
     };
     const info = { ipAddress: '1.1.1.1', userAgent: 'jest' };
     const response = {
-      cookie: vi.fn(),
-      status: vi.fn().mockReturnThis(),
-      send: vi.fn(),
-    } as unknown as Response;
+      setCookie: vi.fn(),
+    } as unknown as FastifyReply;
     const result = { session: { refresh_token: 'rt' } };
     authServiceMock.signIn.mockResolvedValue(result);
 
     await controller.signIn(dto, info, response);
 
     expect(authServiceMock.signIn).toHaveBeenCalledWith(dto, info);
-    expect(response.cookie).toHaveBeenCalledWith(
+    expect(response.setCookie).toHaveBeenCalledWith(
       'refresh_token',
       'rt',
       expect.objectContaining({ httpOnly: true, path: '/' }),
     );
-    expect(response.status).toHaveBeenCalledWith(200);
-    expect(response.send).toHaveBeenCalledWith(result);
   });
 
   // ------------------------------------------------ signUp
@@ -78,12 +75,7 @@ describe('AuthController', () => {
       password: 'p',
       organization_id: 'org',
       role: 'member',
-    } as {
-      email: string;
-      password: string;
-      organization_id: string;
-      role: string;
-    };
+    } as unknown as SignUpInput;
     const info = { ipAddress: '2.2.2.2', userAgent: 'jest' };
     authServiceMock.signUp.mockResolvedValue('signed');
 
@@ -95,12 +87,14 @@ describe('AuthController', () => {
 
   // ------------------------------------------------ refresh
   it('refresh delega en AuthService.refreshToken', async () => {
-    const req = { cookies: { refresh_token: 'rt' } } as unknown as Request;
+    const req = { cookies: { refresh_token: 'rt' } } as unknown as FastifyRequest;
     authServiceMock.refreshToken.mockResolvedValue('refreshed');
 
-    const res = await controller.refresh(req, {} as unknown as Response);
+    const res = await controller.refresh(req);
 
-    expect(authServiceMock.refreshToken).toHaveBeenCalledWith('rt');
+    expect(authServiceMock.refreshToken).toHaveBeenCalledWith({
+      refresh_token: 'rt',
+    });
     expect(res).toEqual({ accessToken: 'refreshed' });
   });
 
@@ -109,8 +103,11 @@ describe('AuthController', () => {
     const sid = 'sess-1';
     authServiceMock.logout.mockResolvedValue(undefined);
 
-    const response = { clearCookie: vi.fn() } as unknown as Response;
-    const result = await controller.logout({ user: { sid } } as unknown as Request, response);
+    const response = { clearCookie: vi.fn() } as unknown as FastifyReply;
+    const result = await controller.logout(
+      { user: { sid } } as FastifyRequest & { user: { sid: string } },
+      response,
+    );
 
     expect(authServiceMock.logout).toHaveBeenCalledWith(sid);
     expect(response.clearCookie).toHaveBeenCalledWith('refresh_token', { path: '/' });

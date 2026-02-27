@@ -17,7 +17,7 @@ import { ZodValidationPipe } from 'nestjs-zod';
 
 import { JwtAuthGuard } from '@/modules/identity/interfaces/guards/jwt.guard';
 import type { ClientProxy } from '@nestjs/microservices';
-import type { Request } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { firstValueFrom } from 'rxjs';
 import { UserService as UserServiceToken } from '../../application/user.service';
 import type { UserService } from '../../application/user.service';
@@ -35,13 +35,16 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getProfile(@Req() req) {
+  async getProfile(@Req() req: FastifyRequest & { user: IUserRequest }) {
     return req.user;
   }
 
   @Put('me')
   @UseGuards(JwtAuthGuard)
-  async updateProfile(@Req() req, @Body() updateData: SignUpInput) {
+  async updateProfile(
+    @Req() req: FastifyRequest & { user: IUserRequest },
+    @Body() updateData: SignUpInput,
+  ) {
     const userId = req.user.sub;
     const user = await this.userService.findById(userId);
     if (!user) throw new NotFoundException('User not found');
@@ -79,7 +82,7 @@ export class UserController {
   @Delete('me/:userId')
   @UseGuards(JwtAuthGuard)
   async deleteProfile(
-    @Req() req: Request & { user: IUserRequest },
+    @Req() req: FastifyRequest & { user: IUserRequest },
     @Param('userId') reqUserId: string,
   ) {
     const user = await this.userService.findById(reqUserId, true); // populate relations
