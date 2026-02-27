@@ -6,10 +6,14 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { FastifyRequest } from "fastify";
+import { PinoLogger } from "nestjs-pino";
 
 @Injectable()
 export class WebhookSignatureGuard implements CanActivate {
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly logger: PinoLogger,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
@@ -20,16 +24,30 @@ export class WebhookSignatureGuard implements CanActivate {
 
     const appSecret = this.configService.get<string>("whatsapp.appSecret");
     if (!appSecret || !signature) {
+      this.logger.warn({
+        event: "webhook.signature.missing",
+        hasSecret: Boolean(appSecret),
+        hasSignature: Boolean(signature),
+      });
       return false;
     }
 
     const rawBody = (request as FastifyRequest & { rawBody?: Buffer }).rawBody;
     if (!rawBody) {
+      this.logger.warn({
+        event: "webhook.signature.rawbody_missing",
+        hasSignature: Boolean(signature),
+      });
       return false;
     }
 
     const expected = this.createSignature(rawBody, appSecret);
-    return this.safeCompare(signature, expected);
+    const ok = this.safeCompare(signature, expected);
+    this.logger.info({
+      event: "webhook.signature.checked",
+      ok,
+    });
+    return ok;
   }
 
   private createSignature(payload: Buffer, secret: string): string {
