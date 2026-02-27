@@ -1,4 +1,4 @@
-import type { RoleType } from '../../../../access-ms/modules/role/types/role.type';
+import type { RoleType } from '@/modules/access/domain/types/role.type';
 
 export interface IUserRequest {
   sub: string;
