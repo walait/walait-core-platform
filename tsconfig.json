@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
+    "types": ["node", "vitest/globals"],
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
