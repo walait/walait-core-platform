@@ -21,6 +21,7 @@ export class WebhookSignatureGuard implements CanActivate {
     const signature = Array.isArray(signatureHeader)
       ? signatureHeader[0]
       : signatureHeader;
+    const contentType = request.headers["content-type"];
 
     const appSecret = this.configService.get<string>("whatsapp.appSecret");
     if (!appSecret || !signature) {
@@ -28,6 +29,7 @@ export class WebhookSignatureGuard implements CanActivate {
         event: "webhook.signature.missing",
         hasSecret: Boolean(appSecret),
         hasSignature: Boolean(signature),
+        contentType,
       });
       return false;
     }
@@ -37,6 +39,7 @@ export class WebhookSignatureGuard implements CanActivate {
       this.logger.warn({
         event: "webhook.signature.rawbody_missing",
         hasSignature: Boolean(signature),
+        contentType,
       });
       return false;
     }
@@ -46,6 +49,8 @@ export class WebhookSignatureGuard implements CanActivate {
     this.logger.info({
       event: "webhook.signature.checked",
       ok,
+      contentType,
+      rawBodyLength: rawBody.length,
     });
     return ok;
   }
