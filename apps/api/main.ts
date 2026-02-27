@@ -25,6 +25,7 @@ async function bootstrap() {
   await app.register(fastifyCookie);
 
   const fastify = app.getHttpAdapter().getInstance() as any;
+  fastify.removeContentTypeParser("application/json");
   fastify.addContentTypeParser(
     "application/json",
     { parseAs: "buffer" as const },
