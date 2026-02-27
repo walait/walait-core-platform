@@ -24,24 +24,32 @@ async function bootstrap() {
   });
   await app.register(fastifyCookie);
 
+  const corsOrigin = process.env.CORS_ORIGIN?.split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: "http://localhost:5173",
+    origin: corsOrigin && corsOrigin.length > 0 ? corsOrigin : true,
     credentials: true,
   });
 
   const rmqEnabled = process.env.ENABLE_RMQ === "true";
   const rmqUrl = process.env.RABBITMQ_URL;
   if (rmqEnabled && rmqUrl) {
-    app.connectMicroservice({
-      transport: Transport.RMQ,
-      options: {
-        urls: [rmqUrl],
-        queue: "identity_queue",
-        queueOptions: { durable: true },
-        prefetchCount: 10,
-      },
-    });
-    await app.startAllMicroservices();
+    try {
+      app.connectMicroservice({
+        transport: Transport.RMQ,
+        options: {
+          urls: [rmqUrl],
+          queue: "identity_queue",
+          queueOptions: { durable: true },
+          prefetchCount: 10,
+        },
+      });
+      await app.startAllMicroservices();
+      console.log("RMQ microservice connected.");
+    } catch (error) {
+      console.error("RMQ connection failed; continuing without RMQ.", error);
+    }
   } else {
     console.log("RMQ disabled; skipping RMQ microservice.");
   }
