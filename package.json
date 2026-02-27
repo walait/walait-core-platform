@@ -68,8 +68,8 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@commitlint/config-conventional": "^19.8.1",
     "@biomejs/biome": "^1.9.4",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.18.0",
     "@nestjs/cli": "^11.0.0",
@@ -84,6 +84,7 @@
     "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^8.34.1",
     "@typescript-eslint/parser": "^8.34.1",
+    "@vitest/coverage-v8": "^2.1.8",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.29.0",
@@ -91,19 +92,19 @@
     "eslint-plugin-boundaries": "^4.2.1",
     "eslint-plugin-prettier": "^5.5.0",
     "globals": "^16.0.0",
+    "jsdom": "^28.1.0",
     "lint-staged": "^16.1.2",
     "prettier": "^3.5.3",
     "source-map-support": "^0.5.21",
     "standard-version": "^9.5.0",
     "supertest": "^7.0.0",
-    "unplugin-swc": "^1.4.4",
-    "vitest": "^2.1.8",
-    "@vitest/coverage-v8": "^2.1.8",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
+    "typescript-eslint": "^8.20.0",
+    "unplugin-swc": "^1.4.4",
+    "vitest": "^2.1.8"
   },
   "config": {
     "owner": "walait",
@@ -112,5 +113,8 @@
       "commit-msg": "commitlint -e --verbose"
     }
   },
-  "trustedDependencies": ["@nestjs/core", "@swc/core"]
+  "trustedDependencies": [
+    "@nestjs/core",
+    "@swc/core"
+  ]
 }
