@@ -7,6 +7,7 @@ import {
   FastifyAdapter,
   type NestFastifyApplication,
 } from "@nestjs/platform-fastify";
+import { Readable } from "node:stream";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -25,22 +26,26 @@ async function bootstrap() {
   await app.register(fastifyCookie);
 
   const fastify = app.getHttpAdapter().getInstance() as any;
-  fastify.removeContentTypeParser("application/json");
-  fastify.addContentTypeParser(
-    "application/json",
-    { parseAs: "buffer" as const },
+  fastify.addHook(
+    "preParsing",
     (
       request: { rawBody?: Buffer },
-      body: Buffer,
-      done: (error: Error | null, value?: unknown) => void,
+      reply: unknown,
+      payload: NodeJS.ReadableStream,
+      done: (error: Error | null, payload?: NodeJS.ReadableStream) => void,
     ) => {
-      request.rawBody = body;
-      try {
-        const parsed = JSON.parse(body.toString("utf8"));
-        done(null, parsed);
-      } catch (error) {
-        done(error as Error, undefined);
-      }
+      const chunks: Buffer[] = [];
+      payload.on("data", (chunk) => {
+        chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+      });
+      payload.on("end", () => {
+        const rawBody = Buffer.concat(chunks);
+        request.rawBody = rawBody;
+        done(null, Readable.from(rawBody));
+      });
+      payload.on("error", (error) => {
+        done(error);
+      });
     },
   );
 
