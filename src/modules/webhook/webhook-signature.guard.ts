@@ -1,11 +1,49 @@
-import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  type CanActivate,
+  type ExecutionContext,
+  Injectable,
+} from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { createHmac, timingSafeEqual } from "node:crypto";
+import type { FastifyRequest } from "fastify";
 
 @Injectable()
 export class WebhookSignatureGuard implements CanActivate {
+  constructor(private readonly configService: ConfigService) {}
+
   canActivate(context: ExecutionContext): boolean {
-    // TODO: Implement X-Hub-Signature-256 validation with Meta app secret.
-    // This requires access to the raw request body before JSON parsing.
-    void context;
-    return true;
+    const request = context.switchToHttp().getRequest<FastifyRequest>();
+    const signatureHeader = request.headers["x-hub-signature-256"];
+    const signature = Array.isArray(signatureHeader)
+      ? signatureHeader[0]
+      : signatureHeader;
+
+    const appSecret = this.configService.get<string>("whatsapp.appSecret");
+    if (!appSecret || !signature) {
+      return false;
+    }
+
+    const rawBody = (request as FastifyRequest & { rawBody?: Buffer }).rawBody;
+    if (!rawBody) {
+      return false;
+    }
+
+    const expected = this.createSignature(rawBody, appSecret);
+    return this.safeCompare(signature, expected);
+  }
+
+  private createSignature(payload: Buffer, secret: string): string {
+    const digest = createHmac("sha256", secret).update(payload).digest("hex");
+    return `sha256=${digest}`;
+  }
+
+  private safeCompare(left: string, right: string): boolean {
+    const leftBuffer = Buffer.from(left, "utf8");
+    const rightBuffer = Buffer.from(right, "utf8");
+    if (leftBuffer.length !== rightBuffer.length) {
+      return false;
+    }
+
+    return timingSafeEqual(leftBuffer, rightBuffer);
   }
 }

@@ -40,8 +40,24 @@ export class WebhookController {
       expectedToken &&
       token === expectedToken
     ) {
+      console.log(
+        JSON.stringify({
+          event: "webhook.verify.success",
+          mode,
+          hasChallenge: Boolean(challenge),
+        }),
+      );
       return challenge ?? "";
     }
+
+    console.warn(
+      JSON.stringify({
+        event: "webhook.verify.failed",
+        mode,
+        tokenPresent: Boolean(token),
+        expectedTokenPresent: Boolean(expectedToken),
+      }),
+    );
 
     throw new ForbiddenException();
   }
@@ -49,7 +65,7 @@ export class WebhookController {
   @Post("webhook")
   @UseGuards(WebhookSignatureGuard)
   @HttpCode(200)
-  handleWebhook(@Body() body: unknown, @Req() request: FastifyRequest) {
+  handleWebhook(@Body() body: unknown, @Req() request: FastifyRequest): void {
     const requestId = this.getRequestId(request);
     const metadata = {
       requestId,
@@ -68,7 +84,7 @@ export class WebhookController {
         );
       });
 
-    return { ok: true };
+    return;
   }
 
   private getRequestId(request: FastifyRequest): string {

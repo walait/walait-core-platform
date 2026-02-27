@@ -24,6 +24,25 @@ async function bootstrap() {
   });
   await app.register(fastifyCookie);
 
+  const fastify = app.getHttpAdapter().getInstance() as any;
+  fastify.addContentTypeParser(
+    "application/json",
+    { parseAs: "buffer" as const },
+    (
+      request: { rawBody?: Buffer },
+      body: Buffer,
+      done: (error: Error | null, value?: unknown) => void,
+    ) => {
+      request.rawBody = body;
+      try {
+        const parsed = JSON.parse(body.toString("utf8"));
+        done(null, parsed);
+      } catch (error) {
+        done(error as Error, undefined);
+      }
+    },
+  );
+
   const corsOrigin = process.env.CORS_ORIGIN?.split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
