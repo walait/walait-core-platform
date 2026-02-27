@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+.env.local
+.env
+.env*
+!.env.example
+coverage
+.husky
+.DS_Store
+data/*.jsonl
