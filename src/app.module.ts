@@ -1,21 +1,22 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_PIPE } from '@nestjs/core';
-import { EventEmitterModule } from '@nestjs/event-emitter';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ZodValidationPipe } from 'nestjs-zod';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { IdentityModule } from './modules/identity/identity.module';
-import { TaxesModule } from './modules/taxes/taxes.module';
-import { getTypeOrmConfig } from './shared/database/typeorm.config';
-import { EventBusModule } from './shared/event-bus/event-bus.module';
+import { ClientsModule, Transport } from "@nestjs/microservices";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+
+import { APP_PIPE } from "@nestjs/core";
+import { AppController } from "./app.controller";
+import { AppService } from "./app.service";
+import { EventBusModule } from "./shared/event-bus/event-bus.module";
+import { EventEmitterModule } from "@nestjs/event-emitter";
+import { IdentityModule } from "./modules/identity/identity.module";
+import { Module } from "@nestjs/common";
+import { TaxesModule } from "./modules/taxes/taxes.module";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { ZodValidationPipe } from "nestjs-zod";
+import { getTypeOrmConfig } from "./shared/database/typeorm.config";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: ['.env.local', '.env'],
+      envFilePath: [".env.local", ".env"],
       isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
@@ -23,9 +24,9 @@ import { EventBusModule } from './shared/event-bus/event-bus.module';
       inject: [ConfigService],
       useFactory: getTypeOrmConfig,
     }),
-    EventBusModule,
-    IdentityModule,
-    TaxesModule,
+    // EventBusModule,
+    // IdentityModule,
+    // TaxesModule,
   ],
   controllers: [AppController],
   providers: [

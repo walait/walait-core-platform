@@ -5,7 +5,7 @@ import { type SignOptions, decode } from "jsonwebtoken";
 
 @Injectable()
 export class TokenService {
-  constructor(private jwtService: JwtService) {}
+  constructor(@Inject(JwtService) private jwtService: JwtService) {}
 
   generateAccessToken(payload: Record<string, unknown>) {
     const secret = process.env.JWT_SECRET ?? "";

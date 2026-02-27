@@ -14,6 +14,7 @@ export class EmailService {
   axiosInstance!: AxiosInstance;
 
   constructor(
+    @Inject(ConfigService)
     private configService: ConfigService,
     @InjectRepository(EmailEntity)
     private readonly emailRepository: Repository<EmailEntity>,
