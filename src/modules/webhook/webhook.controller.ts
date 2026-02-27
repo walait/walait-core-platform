@@ -2,17 +2,17 @@ import { randomUUID } from "node:crypto";
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Header,
   HttpCode,
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { FastifyRequest } from "fastify";
+import type { FastifyReply, FastifyRequest } from "fastify";
 import { WebhookSignatureGuard } from "./webhook-signature.guard";
 import { WebhookService } from "./webhook.service";
 
@@ -26,10 +26,11 @@ export class WebhookController {
   @Get("webhook")
   @Header("content-type", "text/plain")
   verifyWebhook(
+    @Res() reply: FastifyReply,
     @Query("hub.mode") mode?: string,
     @Query("hub.verify_token") token?: string,
     @Query("hub.challenge") challenge?: string,
-  ): string {
+  ): void {
     const expectedToken = this.configService.get<string>(
       "whatsapp.verifyToken",
     );
@@ -47,7 +48,9 @@ export class WebhookController {
           hasChallenge: Boolean(challenge),
         }),
       );
-      return challenge ?? "";
+      const response = String(challenge ?? "");
+      reply.type("text/plain").code(200).send(response);
+      return;
     }
 
     console.warn(
@@ -59,7 +62,8 @@ export class WebhookController {
       }),
     );
 
-    throw new ForbiddenException();
+    reply.type("text/plain").code(403).send("");
+    return;
   }
 
   @Post("webhook")
