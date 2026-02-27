@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "lib": ["es2021"],
+    "target": "es2021",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./build",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node", "vitest/globals"],
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+      "@apps/*": ["src/apps/*"],
+      "@shared/*": ["src/shared/*"],
+      "@taxes-ar/afip/*": ["src/modules/taxes/infrastructure/ar/afip/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "src/migrations"]
+}

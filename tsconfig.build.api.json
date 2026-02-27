@@ -1,0 +1,23 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "emitDecoratorMetadata": false
+  },
+  "include": [
+    "apps/api/**/*.ts",
+    "src/app.controller.ts",
+    "src/app.service.ts",
+    "src/config/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/modules/access/**/*.ts",
+    "src/modules/email/**/*.ts",
+    "src/modules/identity/**/*.ts",
+    "src/modules/organization/**/*.ts",
+    "src/modules/parser/**/*.ts",
+    "src/modules/storage/**/*.ts",
+    "src/modules/taxes/**/*.ts",
+    "src/modules/webhook/**/*.ts"
+  ],
+  "exclude": ["node_modules", "test", "dist", "build", "**/*spec.ts"]
+}
