@@ -57,6 +57,8 @@ export class WebhookController {
       event: "webhook.verify.failed",
       mode,
       tokenPresent: Boolean(token),
+      token,
+      expectedToken,
       expectedTokenPresent: Boolean(expectedToken),
     });
 
