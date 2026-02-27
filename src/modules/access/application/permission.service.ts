@@ -1,5 +1,5 @@
-import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { UserRole } from "../domain/model/user-role.entity";
 
@@ -7,7 +7,8 @@ import { UserRole } from "../domain/model/user-role.entity";
 @Injectable()
 export class PermissionService {
   constructor(
-    @InjectRepository(UserRole) private urRepo: Repository<UserRole>,
+    @InjectRepository(UserRole)
+    private urRepo: Repository<UserRole>,
   ) {}
 
   /** Devuelve los nombres de permisos del usuario (set uniq) */

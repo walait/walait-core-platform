@@ -5,8 +5,6 @@ import { TaxTicket } from "@/modules/taxes/domain/ticket.interface";
 
 @Injectable()
 export class ArTaxesProvider implements ITaxProvider {
-  constructor() {}
-
   canHandle(countryIso: string): boolean {
     return countryIso === "AR";
   }
