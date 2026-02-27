@@ -12,12 +12,23 @@ import { TaxesModule } from "./modules/taxes/taxes.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ZodValidationPipe } from "nestjs-zod";
 import { getTypeOrmConfig } from "./shared/database/typeorm.config";
+import { LoggerModule } from "nestjs-pino";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: [".env.local", ".env"],
       isGlobal: true,
+    }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.LOG_LEVEL ?? "info",
+        redact: [
+          "req.headers.authorization",
+          "req.headers.cookie",
+          "req.headers['x-hub-signature-256']",
+        ],
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
