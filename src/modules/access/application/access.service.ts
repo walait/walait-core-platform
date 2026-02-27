@@ -1,17 +1,19 @@
-import type { User } from '@/modules/identity/domain/model/user.entity';
-import type { Membership } from '@/modules/organization/domain/model/membership.entity';
-import type { Organization } from '@/modules/organization/domain/model/organization.entity';
-import { Injectable } from '@nestjs/common';
-import type { EntityManager } from 'typeorm';
-import type { UserRole } from '../domain/model/user-role.entity';
-import type { RoleService } from './role.service';
-import type { UserRoleService } from './user-role.service';
+import type { User } from "@/modules/identity/domain/model/user.entity";
+import type { Membership } from "@/modules/organization/domain/model/membership.entity";
+import type { Organization } from "@/modules/organization/domain/model/organization.entity";
+import { Inject, Injectable } from "@nestjs/common";
+import type { EntityManager } from "typeorm";
+import type { UserRole } from "../domain/model/user-role.entity";
+import { RoleService } from "./role.service";
+import { UserRoleService } from "./user-role.service";
 
 @Injectable()
 export class AccessService {
   // Add your service methods here
   constructor(
+    @Inject(UserRoleService)
     private readonly userRoleService: UserRoleService,
+    @Inject(RoleService)
     private readonly roleService: RoleService,
   ) {}
 
@@ -23,28 +25,37 @@ export class AccessService {
     manager?: EntityManager,
   ): Promise<UserRole> {
     if (!isGlobalAdmin) {
-      let role = (await this.userRoleService.findByUserIdAndRoleId(user.id, membership.role)).role;
+      let role = (
+        await this.userRoleService.findByUserIdAndRoleId(
+          user.id,
+          membership.role,
+        )
+      ).role;
       if (!role) {
-        role = await this.roleService.getRoleByNameAndScope(membership.role, 'organization');
+        role = await this.roleService.getRoleByNameAndScope(
+          membership.role,
+          "organization",
+        );
       }
       return this.userRoleService.createUserRole(
         {
           user_id: user.id,
           role,
-          scope: 'organization',
+          scope: "organization",
           organization_id: organization.id,
         },
         manager,
       );
     }
 
-    const superadminRole = await this.userRoleService.getAdminRole('superadmin');
+    const superadminRole =
+      await this.userRoleService.getAdminRole("superadmin");
 
     return this.userRoleService.createUserRole(
       {
         user_id: user.id,
         role: superadminRole,
-        scope: 'global',
+        scope: "global",
         organization_id: organization.id,
       },
       manager,

@@ -1,22 +1,36 @@
-import { BadRequestException, Body, Controller, Injectable, Logger, Post } from '@nestjs/common';
-import { XMLParser } from 'fast-xml-parser';
-import type { WsaaService } from '../../infrastructure/ar/afip/auth/wsaa/service/wsaa.service';
-import type { FacturacionService } from '../../infrastructure/ar/afip/wsfev1/services/facturacion.service';
-import type { Wsfev1Service } from '../../infrastructure/ar/afip/wsfev1/services/wsfev1.service';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Inject,
+  Injectable,
+  Logger,
+  Post,
+} from "@nestjs/common";
+import { XMLParser } from "fast-xml-parser";
+import { WsaaService } from "../../infrastructure/ar/afip/auth/wsaa/service/wsaa.service";
+import { FacturacionService } from "../../infrastructure/ar/afip/wsfev1/services/facturacion.service";
+import { Wsfev1Service } from "../../infrastructure/ar/afip/wsfev1/services/wsfev1.service";
 
 @Injectable()
-@Controller('wsfev1')
+@Controller("wsfev1")
 export class Wsfev1Controller {
   private readonly logger = new Logger(Wsfev1Controller.name);
   constructor(
+    @Inject(Wsfev1Service)
     private readonly wsfev1Service: Wsfev1Service,
+    @Inject(WsaaService)
     private readonly wsaaService: WsaaService,
+    @Inject(FacturacionService)
     private readonly facturacionService: FacturacionService,
   ) {}
 
-  @Post('iva-types')
+  @Post("iva-types")
   async getIvaTypes(@Body() body: { tax_id: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
 
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getIvaTypes({
@@ -29,9 +43,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('invoice-types')
+  @Post("invoice-types")
   async getInvoiceTypes(@Body() body: { tax_id: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
 
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getInvoiceTypes({
@@ -44,9 +61,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('concept-types')
+  @Post("concept-types")
   async getConceptTypes(@Body() body: { tax_id: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
 
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getConceptTypes({
@@ -59,9 +79,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('doc-types')
+  @Post("doc-types")
   async getDocTypes(@Body() body: { tax_id: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getDocTypes({
         token,
@@ -72,9 +95,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('currency-types')
+  @Post("currency-types")
   async getCurrencyTypes(@Body() body: { tax_id: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getCurrencyTypes({
         token,
@@ -85,9 +111,14 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('last-invoice')
-  async getLastInvoice(@Body() body: { tax_id: string; salesPoint: number; receiptType: number }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+  @Post("last-invoice")
+  async getLastInvoice(
+    @Body() body: { tax_id: string; salesPoint: number; receiptType: number },
+  ) {
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getLastInvoice({
         token,
@@ -100,12 +131,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('invoice')
+  @Post("invoice")
   async submitInvoice(@Body() body) {
     const invoice = body.invoice;
 
     const { token, sign } = await this.wsaaService.getAuthorizationTicket(
-      'wsfe',
+      "wsfe",
       invoice.seller.tax_id,
     );
     const response = await this.handleResponsePromise(
@@ -118,9 +149,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('sales-point')
+  @Post("sales-point")
   async getSalesPoint(@Body() body: { tax_id: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getSalesPoint({
         token,
@@ -131,9 +165,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('exchange-rate')
+  @Post("exchange-rate")
   async getExchangeRate(@Body() body: { tax_id: string; currencyId: string }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getExchangeRate(
         {
@@ -147,9 +184,12 @@ export class Wsfev1Controller {
     return response;
   }
 
-  @Post('get-iva-receptor')
+  @Post("get-iva-receptor")
   async getIvaReceptor(@Body() body: { tax_id: string; receiptType: number }) {
-    const { token, sign } = await this.wsaaService.getAuthorizationTicket('wsfe', body.tax_id);
+    const { token, sign } = await this.wsaaService.getAuthorizationTicket(
+      "wsfe",
+      body.tax_id,
+    );
     const response = await this.handleResponsePromise(
       this.wsfev1Service.getCondicionIvaReceptor({
         token,
@@ -166,7 +206,7 @@ export class Wsfev1Controller {
     return parser.parse(response.toString());
   }
 
-  handleResponsePromise(promise: Promise<string | Buffer>): Promise<any> {
+  handleResponsePromise<T = unknown>(promise: Promise<T>): Promise<T> {
     return promise.catch((error) => {
       throw new BadRequestException(error.message);
     });

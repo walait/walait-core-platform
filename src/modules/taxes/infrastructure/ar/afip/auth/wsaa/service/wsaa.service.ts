@@ -1,17 +1,17 @@
-import { randomUUID } from 'node:crypto';
-import { rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import * as path from 'node:path';
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { XMLParser } from 'fast-xml-parser';
-import { cleanupTmpLink } from '../../../shared/utils';
-import type { PkiRepository } from '../../cert/modules/pki/repositories/pki.repository';
-import { decryptPem } from '../../cert/modules/pki/utils';
-import type { TicketBuilder } from '../builder/ticket.builder';
-import type { TicketSigner } from '../signer/ticket.signer';
-import type { TokenStore } from '../store/token.store';
-import type { WsaaSoapClient } from '../wsaa.client';
+import { randomUUID } from "node:crypto";
+import { rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import * as path from "node:path";
+import { Inject, Injectable, Logger } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { XMLParser } from "fast-xml-parser";
+import { cleanupTmpLink } from "../../../shared/utils";
+import { PkiRepository } from "../../cert/modules/pki/repositories/pki.repository";
+import { decryptPem } from "../../cert/modules/pki/utils";
+import { TicketBuilder } from "../builder/ticket.builder";
+import { TicketSigner } from "../signer/ticket.signer";
+import { TokenStore } from "../store/token.store";
+import { WsaaSoapClient } from "../wsaa.client";
 
 @Injectable()
 export class WsaaService {
@@ -34,7 +34,7 @@ export class WsaaService {
     @Inject(PkiRepository)
     private readonly pkiRepo: PkiRepository,
   ) {
-    this.endpointUrl = this.config.getOrThrow<string>('WSAA_LOGIN_URL');
+    this.endpointUrl = this.config.getOrThrow<string>("WSAA_LOGIN_URL");
   }
 
   /**
@@ -50,8 +50,8 @@ export class WsaaService {
     const key = decryptPem(pki.encryptPkPem);
     const passphrase = decryptPem(pki.passphrase);
 
-    this.validatePEM(cert, 'cert');
-    this.validatePEM(key, 'key');
+    this.validatePEM(cert, "cert");
+    this.validatePEM(key, "key");
 
     const cached = await this.store.getValid(service, cert, key);
     if (cached) return this.parserResponse(cached);
@@ -66,7 +66,12 @@ export class WsaaService {
     await writeFile(keyPath, key);
 
     try {
-      const cms = await this.signer.sign(traPath, certPath, keyPath, passphrase);
+      const cms = await this.signer.sign(
+        traPath,
+        certPath,
+        keyPath,
+        passphrase,
+      );
       const taXml = await this.client.callLoginCms(
         cms,
         `${this.endpointUrl}?WSDL`,
@@ -84,7 +89,7 @@ export class WsaaService {
   }
 
   private validatePEM(content: string, label: string): void {
-    if (!content.includes('-----BEGIN') || !content.includes('-----END')) {
+    if (!content.includes("-----BEGIN") || !content.includes("-----END")) {
       throw new Error(`El archivo ${label} no tiene formato PEM válido`);
     }
   }
@@ -99,7 +104,7 @@ export class WsaaService {
     const expirationTime = root?.loginTicketResponse?.header?.expirationTime;
 
     if (!token || !sign || !expirationTime) {
-      throw new Error('Token o firma inválidos en TA');
+      throw new Error("Token o firma inválidos en TA");
     }
     return { token, sign, expirationTime };
   }

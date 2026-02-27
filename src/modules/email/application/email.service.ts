@@ -1,19 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
-import { InjectRepository } from '@nestjs/typeorm';
-import axios, { type AxiosInstance } from 'axios';
-import type { Repository } from 'typeorm';
-import { EmailEntity } from '../domain/model/email.entity';
+import { Inject, Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { InjectRepository } from "@nestjs/typeorm";
+import axios, { type AxiosInstance } from "axios";
+import type { Repository } from "typeorm";
+import { EmailEntity } from "../domain/model/email.entity";
 import {
   BreveEmailTemplateSchema,
   type BrevoEmailTemplate,
-} from '../interfaces/http/schemas/breve.schema';
+} from "../interfaces/http/schemas/breve.schema";
 
 @Injectable()
 export class EmailService {
-  axiosInstance: AxiosInstance;
+  axiosInstance!: AxiosInstance;
 
   constructor(
+    @Inject(ConfigService)
     private configService: ConfigService,
     @InjectRepository(EmailEntity)
     private readonly emailRepository: Repository<EmailEntity>,
@@ -22,42 +23,45 @@ export class EmailService {
   }
 
   private init() {
-    const emailServiceEnabled = this.configService.get<boolean>('EMAIL_SERVICE_ENABLED');
+    this.axiosInstance = axios.create();
+    const emailServiceEnabled = this.configService.get<boolean>(
+      "EMAIL_SERVICE_ENABLED",
+    );
     if (!emailServiceEnabled) {
-      console.warn('Email service is disabled in the configuration.');
+      console.warn("Email service is disabled in the configuration.");
       return;
     }
     // Initialize email service here, e.g., set up SMTP client
     this.axiosInstance = axios.create({
-      baseURL: this.configService.get<string>('EMAIL_SERVICE_URL'),
+      baseURL: this.configService.get<string>("EMAIL_SERVICE_URL"),
       headers: {
-        'Content-Type': 'application/json',
-        'api-key': this.configService.get<string>('EMAIL_API_KEY'),
+        "Content-Type": "application/json",
+        "api-key": this.configService.get<string>("EMAIL_API_KEY"),
       },
     });
 
-    console.log('Email service initialized.');
+    console.log("Email service initialized.");
   }
 
   async getAllTemplates(): Promise<BrevoEmailTemplate[]> {
     // Logic to fetch all email templates
-    console.log('Fetching all email templates...');
+    console.log("Fetching all email templates...");
 
     const urlSearchParams = new URLSearchParams();
-    urlSearchParams.append('limit', '1000');
-    urlSearchParams.append('offset', '0');
-    urlSearchParams.append('templateStatus', 'true');
+    urlSearchParams.append("limit", "1000");
+    urlSearchParams.append("offset", "0");
+    urlSearchParams.append("templateStatus", "true");
     const response = await this.axiosInstance.get(
       `/v3/smtp/templates?${urlSearchParams.toString()}`,
     );
     if (response.status === 200) {
-      console.log('Email templates fetched successfully.');
+      console.log("Email templates fetched successfully.");
       return response.data.templates.map((template: unknown) =>
         BreveEmailTemplateSchema.parse(template),
       );
     }
-    console.error('Failed to fetch email templates:', response.statusText);
-    throw new Error('Failed to fetch email templates');
+    console.error("Failed to fetch email templates:", response.statusText);
+    throw new Error("Failed to fetch email templates");
   }
 
   async getTemplateBySlug(templateSlug: string) {
@@ -83,7 +87,7 @@ export class EmailService {
     // Logic to send an email using a specific template
     console.log(`Sending email to ${to} with template ${emailEntity.slug}`);
 
-    const response = await this.axiosInstance.post('/v3/smtp/email', {
+    const response = await this.axiosInstance.post("/v3/smtp/email", {
       sender: emailEntity.sender,
       to: [{ email: to }],
       subject: subject,
@@ -92,16 +96,16 @@ export class EmailService {
     });
 
     if ([202, 201].includes(response.status)) {
-      console.log('Email sent successfully.');
+      console.log("Email sent successfully.");
     } else {
-      console.error('Failed to send email:', response.data);
-      throw new Error('Failed to send email');
+      console.error("Failed to send email:", response.data);
+      throw new Error("Failed to send email");
     }
   }
 
   async syncTemplates(): Promise<{ message: string }> {
     // Logic to sync email templates with the database
-    console.log('Syncing email templates...');
+    console.log("Syncing email templates...");
 
     const templates = await this.getAllTemplates();
     for (const template of templates) {
@@ -123,7 +127,7 @@ export class EmailService {
     }
 
     return {
-      message: 'Syncronize templates finalize successfully',
+      message: "Syncronize templates finalize successfully",
     };
   }
 
@@ -131,13 +135,15 @@ export class EmailService {
     // Logic to fetch a specific email template by ID
     console.log(`Fetching email template with ID: ${templateId}`);
 
-    const response = await this.axiosInstance.get(`/v3/smtp/templates/${templateId}`);
+    const response = await this.axiosInstance.get(
+      `/v3/smtp/templates/${templateId}`,
+    );
     if (response.status === 200) {
-      console.log('Email template fetched successfully.');
+      console.log("Email template fetched successfully.");
       return BreveEmailTemplateSchema.parse(response.data);
     }
-    console.error('Failed to fetch email template:', response.statusText);
-    throw new Error('Failed to fetch email template');
+    console.error("Failed to fetch email template:", response.statusText);
+    throw new Error("Failed to fetch email template");
   }
 
   sendEmail(to: string, subject: string, body: string): void {

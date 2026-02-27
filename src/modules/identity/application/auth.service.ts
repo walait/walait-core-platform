@@ -1,5 +1,5 @@
-import { EmailTemplate } from '@/modules/email/domain/email.enum';
-import { Organization } from '@/modules/organization/domain/model/organization.entity';
+import { EmailTemplate } from "@/modules/email/domain/email.enum";
+import { Organization } from "@/modules/organization/domain/model/organization.entity";
 import {
   Body,
   ConflictException,
@@ -12,26 +12,29 @@ import {
   Req,
   UnauthorizedException,
   UnprocessableEntityException,
-} from '@nestjs/common';
-import { ConfigService as ConfigServiceToken } from '@nestjs/config';
-import type { ConfigService } from '@nestjs/config';
-import type { ClientProxy } from '@nestjs/microservices';
-import { hash } from 'argon2';
-import { firstValueFrom } from 'rxjs';
-import { DataSource as DataSourceToken } from 'typeorm';
-import type { DataSource } from 'typeorm';
-import type { Session } from '../domain/model/session.entity';
-import type { User } from '../domain/model/user.entity';
-import type { IUserRequest } from '../domain/user.interface';
-import type { SignInInput, SignUpInput } from '../interfaces/schemas/auth.schema';
-import { PasswordService as PasswordServiceToken } from './password.service';
-import type { PasswordService } from './password.service';
-import { SessionService as SessionServiceToken } from './session.service';
-import type { SessionService } from './session.service';
-import { TokenService as TokenServiceToken } from './token.service';
-import type { TokenService } from './token.service';
-import { UserService as UserServiceToken } from './user.service';
-import type { UserService } from './user.service';
+} from "@nestjs/common";
+import { ConfigService as ConfigServiceToken } from "@nestjs/config";
+import type { ConfigService } from "@nestjs/config";
+import type { ClientProxy } from "@nestjs/microservices";
+import { hash } from "argon2";
+import { firstValueFrom } from "rxjs";
+import { DataSource as DataSourceToken } from "typeorm";
+import type { DataSource } from "typeorm";
+import type { Session } from "../domain/model/session.entity";
+import type { User } from "../domain/model/user.entity";
+import type { IUserRequest } from "../domain/user.interface";
+import type {
+  SignInInput,
+  SignUpInput,
+} from "../interfaces/schemas/auth.schema";
+import { PasswordService as PasswordServiceToken } from "./password.service";
+import type { PasswordService } from "./password.service";
+import { SessionService as SessionServiceToken } from "./session.service";
+import type { SessionService } from "./session.service";
+import { TokenService as TokenServiceToken } from "./token.service";
+import type { TokenService } from "./token.service";
+import { UserService as UserServiceToken } from "./user.service";
+import type { UserService } from "./user.service";
 @Injectable()
 export class AuthService {
   constructor(
@@ -45,18 +48,25 @@ export class AuthService {
     private readonly tokenService: TokenService,
     @Inject(PasswordServiceToken)
     private readonly passwordService: PasswordService,
-    @Inject('EVENT_BUS') private client: ClientProxy,
+    @Inject("EVENT_BUS") private client: ClientProxy,
     @Inject(ConfigServiceToken)
     private readonly configService: ConfigService,
   ) {}
 
-  async signIn(data: SignInInput, client: { ipAddress: string; userAgent: string }) {
+  async signIn(
+    data: SignInInput,
+    client: { ipAddress: string; userAgent: string },
+  ) {
     const user = await this.validateSignIn(data, client);
 
-    const session = await this.createSession(user.id, client.ipAddress, client.userAgent);
+    const session = await this.createSession(
+      user.id,
+      client.ipAddress,
+      client.userAgent,
+    );
 
     const membership = await firstValueFrom(
-      this.client.send('membership.getMembershipAndOrgById', {
+      this.client.send("membership.getMembershipAndOrgById", {
         user_id: user.id,
       }),
     );
@@ -65,11 +75,11 @@ export class AuthService {
 
     const tokens = await this.generateCredentials(user, session, membership);
 
-    this.client.send('audit.user.logged_in', {
+    this.client.send("audit.user.logged_in", {
       user_id: user.id,
       email: user.email,
-      organization_id: membership.organization?.id ?? 'global',
-      role: membership.role ?? 'member',
+      organization_id: membership.organization?.id ?? "global",
+      role: membership.role ?? "member",
       session_id: session.id,
       ip_address: client.ipAddress,
       user_agent: client.userAgent,
@@ -83,12 +93,15 @@ export class AuthService {
     };
   }
 
-  async signUp(data: SignUpInput, client: { ipAddress: string; userAgent: string }) {
+  async signUp(
+    data: SignUpInput,
+    client: { ipAddress: string; userAgent: string },
+  ) {
     await this.validateSignUp(data);
 
     const user = await this.userService.createUser(data);
 
-    this.client.send('audit.user.created', {
+    this.client.send("audit.user.created", {
       user_id: user.id,
       email: user.email,
       timestamp: new Date().toISOString(),
@@ -96,12 +109,18 @@ export class AuthService {
 
     await this.createSession(user.id, client.ipAddress, client.userAgent);
 
-    const { membership, organization } = await this.validateOrganizationAndMembership({
-      ...data,
-      user,
-    });
+    const { membership, organization } =
+      await this.validateOrganizationAndMembership({
+        ...data,
+        user,
+      });
 
-    await this.assignRole({ user, membership, organization, isGlobalAdmin: data.is_global_admin });
+    await this.assignRole({
+      user,
+      membership,
+      organization,
+      isGlobalAdmin: data.is_global_admin,
+    });
 
     const emailTokenExpiration = new Date(Date.now() + 60 * 60 * 1000);
 
@@ -111,11 +130,11 @@ export class AuthService {
         expires_at: emailTokenExpiration,
       },
       process.env.EMAIL_VERIFICATION_SECRET,
-      '1h',
+      "1h",
     );
 
     await firstValueFrom(
-      this.client.send('email.verification_requested', {
+      this.client.send("email.verification_requested", {
         user_id: user.id,
         email: user.email,
         first_name: user.first_name,
@@ -166,25 +185,27 @@ export class AuthService {
   }
 
   async refreshToken(data: { refresh_token: string }) {
-    const decoded = this.tokenService.decodePayload<IUserRequest>(data.refresh_token);
+    const decoded = this.tokenService.decodePayload<IUserRequest>(
+      data.refresh_token,
+    );
 
     const session = await this.sessionService.getActiveSessionById(decoded.sid);
-    if (!session) throw new UnauthorizedException('Invalid session');
+    if (!session) throw new UnauthorizedException("Invalid session");
 
     await this.validateRefreshToken(session, data.refresh_token, decoded);
 
     const user = session.user;
 
     const membership = await firstValueFrom(
-      this.client.send('membership.getMembershipAndOrgById', {
+      this.client.send("membership.getMembershipAndOrgById", {
         user_id: user.id,
       }),
     );
     const tokens = await this.generateCredentials(user, session, membership);
 
-    this.client.send('audit.user.token_refreshed', {
+    this.client.send("audit.user.token_refreshed", {
       user_id: user.id,
-      organization_id: membership.organization?.id ?? 'global',
+      organization_id: membership.organization?.id ?? "global",
       session_id: session.id,
       timestamp: new Date().toISOString(),
     });
@@ -202,7 +223,7 @@ export class AuthService {
   //#region utilities
   private sendEmailIfNotValidateAccount(user: User, ipAddress: string) {
     if (!user.is_email_verified) {
-      this.client.send('email.login_pending_verification', {
+      this.client.send("email.login_pending_verification", {
         user_id: user.id,
         email: user.email,
         ip_address: ipAddress,
@@ -216,8 +237,8 @@ export class AuthService {
       sub: user.id,
       sid: session.id,
       email: user.email,
-      organization_id: membership.organization?.id ?? 'global',
-      role: membership.role ?? 'member',
+      organization_id: membership.organization?.id ?? "global",
+      role: membership.role ?? "member",
     });
 
     await this.sessionService.updateWithNewTokens(
@@ -227,7 +248,7 @@ export class AuthService {
       7 * 24 * 60 * 60 * 1000,
     );
 
-    this.client.send('audit.session.refreshed', {
+    this.client.send("audit.session.refreshed", {
       session_id: session.id,
       user_id: user.id,
       ip_address: session.ip_address,
@@ -238,13 +259,17 @@ export class AuthService {
     return tokens;
   }
 
-  private async createSession(userId: string, ipAddress: string, userAgent: string) {
+  private async createSession(
+    userId: string,
+    ipAddress: string,
+    userAgent: string,
+  ) {
     const session = await this.sessionService.create(userId, {
       user_agent: userAgent,
       ip_address: ipAddress,
     });
 
-    this.client.send('audit.session.created', {
+    this.client.send("audit.session.created", {
       session_id: session.id,
       user_id: userId,
       ip_address: ipAddress,
@@ -260,61 +285,69 @@ export class AuthService {
     { ipAddress, userAgent }: { ipAddress: string; userAgent: string },
   ) {
     const user = await this.userService.findByEmail(email, true);
-    if (!user) throw new NotFoundException('User not found');
+    if (!user) throw new NotFoundException("User not found");
 
-    const valid = await this.passwordService.checkPassword(user.password_hash, password);
+    const valid = await this.passwordService.checkPassword(
+      user.password_hash,
+      password,
+    );
 
     if (!valid) {
-      this.client.send('audit.user.login_failed', {
+      this.client.send("audit.user.login_failed", {
         email,
         ip_address: ipAddress,
         user_agent: userAgent,
         timestamp: new Date().toISOString(),
       });
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException("Invalid credentials");
     }
 
     const activeSession = await this.sessionService.getActiveByUser(user.id);
 
     if (
       activeSession &&
-      (activeSession.ip_address !== ipAddress || activeSession.user_agent !== userAgent)
+      (activeSession.ip_address !== ipAddress ||
+        activeSession.user_agent !== userAgent)
     ) {
-      this.client.send('audit.user.login_conflict', {
+      this.client.send("audit.user.login_conflict", {
         user_id: user.id,
         active_session_id: activeSession.id,
         new_ip: ipAddress,
         new_user_agent: userAgent,
         timestamp: new Date().toISOString(),
       });
-      throw new ConflictException('User already logged in');
+      throw new ConflictException("User already logged in");
     }
 
     return user;
   }
 
   private async validateSignUp(data: SignUpInput) {
-    const allowGlobal = this.configService.get<boolean>('ALLOW_GLOBAL_SIGN_UP');
-    const globalSecretKey = this.configService.get<string>('GLOBAL_SECRET_KEY');
+    const allowGlobal = this.configService.get<boolean>("ALLOW_GLOBAL_SIGN_UP");
+    const globalSecretKey = this.configService.get<string>("GLOBAL_SECRET_KEY");
     if (await this.userService.existsByEmail(data.email)) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
 
     if (!data.organization_id) {
-      throw new ConflictException('Organization ID is required');
+      throw new ConflictException("Organization ID is required");
     }
 
-    if (data.is_global_admin && (!allowGlobal || data.global_admin_key !== globalSecretKey)) {
-      throw new ForbiddenException('Not authorized to create global admin');
+    if (
+      data.is_global_admin &&
+      (!allowGlobal || data.global_admin_key !== globalSecretKey)
+    ) {
+      throw new ForbiddenException("Not authorized to create global admin");
     }
   }
 
   private async generateTokens(payload: IUserRequest) {
     const sessionSecret = this.tokenService.generateSessionSecret();
 
+    const tokenPayload = payload as unknown as Record<string, unknown>;
     const [access_token, refresh_token] = await Promise.all([
-      this.tokenService.generateAccessToken(payload),
-      this.tokenService.generateRefreshToken(payload, sessionSecret),
+      this.tokenService.generateAccessToken(tokenPayload),
+      this.tokenService.generateRefreshToken(tokenPayload, sessionSecret),
     ]);
 
     return {
@@ -331,29 +364,29 @@ export class AuthService {
     user,
   }: SignUpInput & { user: User }) {
     const organization = await firstValueFrom(
-      this.client.send('organizations.getById', {
+      this.client.send("organizations.getById", {
         organization_id,
       }),
     );
 
     if (!organization) {
-      throw new ConflictException('Organization not exists');
+      throw new ConflictException("Organization not exists");
     }
 
     if (!organization.is_active) {
       throw new UnprocessableEntityException(
-        'Organization not allowed or inactive, contact to administration',
+        "Organization not allowed or inactive, contact to administration",
       );
     }
 
     const membership = await firstValueFrom(
-      this.client.send('membership.createMembership', {
+      this.client.send("membership.createMembership", {
         user_id: user.id,
         organization,
       }),
     );
 
-    this.client.send('audit.organization.membership_added', {
+    this.client.send("audit.organization.membership_added", {
       user_id: user.id,
       organization_id: organization.id,
       role,
@@ -375,7 +408,7 @@ export class AuthService {
     organization;
   }) {
     await firstValueFrom(
-      this.client.send('user-roles.createUserRole', {
+      this.client.send("user-roles.createUserRole", {
         isGlobalAdmin,
         user_id: user.id,
         role_name: membership?.role,
@@ -383,7 +416,7 @@ export class AuthService {
       }),
     );
 
-    this.client.send('audit.user.assigned_initial_role', {
+    this.client.send("audit.user.assigned_initial_role", {
       user_id: user.id,
       organization_id: organization.id,
       is_global_admin: isGlobalAdmin,
@@ -391,38 +424,42 @@ export class AuthService {
       timestamp: new Date().toISOString(),
     });
   }
-  private async validateRefreshToken(session: Session, token: string, decoded: IUserRequest) {
+  private async validateRefreshToken(
+    session: Session,
+    token: string,
+    decoded: IUserRequest,
+  ) {
     try {
       await this.tokenService.verifyRefreshToken(token, session.session_secret);
     } catch {
-      this.client.send('audit.session.refresh_failed', {
-        reason: 'invalid_signature',
+      this.client.send("audit.session.refresh_failed", {
+        reason: "invalid_signature",
         session_id: decoded.sid,
         user_id: decoded.sub,
         timestamp: new Date().toISOString(),
       });
-      throw new UnauthorizedException('Invalid refresh token signature');
+      throw new UnauthorizedException("Invalid refresh token signature");
     }
 
     const isValid = await this.sessionService.verifyTokenHash(session, token);
     if (!isValid) {
-      this.client.send('audit.session.refresh_failed', {
-        reason: 'hash_mismatch',
+      this.client.send("audit.session.refresh_failed", {
+        reason: "hash_mismatch",
         session_id: decoded.sid,
         user_id: decoded.sub,
         timestamp: new Date().toISOString(),
       });
-      throw new UnauthorizedException('Refresh token hash mismatch');
+      throw new UnauthorizedException("Refresh token hash mismatch");
     }
 
     if (session.expires_at < new Date()) {
-      this.client.send('audit.session.refresh_failed', {
-        reason: 'expired',
+      this.client.send("audit.session.refresh_failed", {
+        reason: "expired",
         session_id: decoded.sid,
         user_id: decoded.sub,
         timestamp: new Date().toISOString(),
       });
-      throw new UnauthorizedException('Refresh token expired');
+      throw new UnauthorizedException("Refresh token expired");
     }
   }
 

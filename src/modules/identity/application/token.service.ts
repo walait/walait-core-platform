@@ -1,25 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { randomBytes } from 'crypto';
-import { decode } from 'jsonwebtoken';
+import { randomBytes } from "node:crypto";
+import { Inject, Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { type SignOptions, decode } from "jsonwebtoken";
 
 @Injectable()
 export class TokenService {
-  constructor(private jwtService: JwtService) {}
+  constructor(@Inject(JwtService) private jwtService: JwtService) {}
 
-  generateAccessToken(payload: Record<string, any>) {
-    return this.generateToken(payload, process.env.JWT_SECRET, '15m');
+  generateAccessToken(payload: Record<string, unknown>) {
+    const secret = process.env.JWT_SECRET ?? "";
+    return this.generateToken(payload, secret, "15m");
   }
 
-  generateToken(payload: Record<string, any>, secret: string, expiresIn: string) {
+  generateToken(
+    payload: Record<string, unknown>,
+    secret: string,
+    expiresIn: SignOptions["expiresIn"],
+  ) {
     return this.jwtService.signAsync(payload, {
       secret,
       expiresIn,
     });
   }
 
-  generateRefreshToken(payload: Record<string, any>, secret: string) {
-    return this.generateToken(payload, secret, '7d');
+  generateRefreshToken(payload: Record<string, unknown>, secret: string) {
+    return this.generateToken(payload, secret, "7d");
   }
 
   verifyRefreshToken(token: string, secret: string) {
@@ -28,7 +33,7 @@ export class TokenService {
 
   verifyAccessToken(token: string) {
     return this.jwtService.verifyAsync(token, {
-      secret: process.env.JWT_SECRET,
+      secret: process.env.JWT_SECRET ?? "",
     });
   }
 
@@ -37,6 +42,6 @@ export class TokenService {
   }
 
   generateSessionSecret(): string {
-    return randomBytes(32).toString('hex');
+    return randomBytes(32).toString("hex");
   }
 }

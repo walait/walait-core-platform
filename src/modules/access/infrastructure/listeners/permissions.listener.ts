@@ -1,9 +1,14 @@
 // src/services/email-ms/listeners/permission.rmq.ts
-import { Controller } from '@nestjs/common';
-import { Ctx, MessagePattern, Payload, type RmqContext } from '@nestjs/microservices';
+import { Controller, Inject } from "@nestjs/common";
+import {
+  Ctx,
+  MessagePattern,
+  Payload,
+  type RmqContext,
+} from "@nestjs/microservices";
 
-import type { UserRoleService } from '../../application/user-role.service';
-import { canAccessOrOwnsResource } from '../../interfaces/policy/permission.policy';
+import { UserRoleService } from "../../application/user-role.service";
+import { canAccessOrOwnsResource } from "../../interfaces/policy/permission.policy";
 
 type PermissionMsg = {
   action: string;
@@ -13,13 +18,16 @@ type PermissionMsg = {
 
 @Controller()
 export class PermissionRmqListener {
-  constructor(private readonly userRolesService: UserRoleService) {}
+  constructor(
+    @Inject(UserRoleService)
+    private readonly userRolesService: UserRoleService,
+  ) {}
 
   /**
    * Devuelve `true | false` según si el requester (userId)
    * puede realizar `action` sobre el recurso de reqUserId.
    */
-  @MessagePattern('permission.canAccessResource')
+  @MessagePattern("permission.canAccessResource")
   async handleCanAccessResource(
     @Payload() { action, reqUserId, userId }: PermissionMsg,
     @Ctx() context: RmqContext,
