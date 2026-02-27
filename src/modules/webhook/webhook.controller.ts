@@ -13,6 +13,7 @@ import {
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import type { FastifyReply, FastifyRequest } from "fastify";
+import { PinoLogger } from "nestjs-pino";
 import { WebhookSignatureGuard } from "./webhook-signature.guard";
 import { WebhookService } from "./webhook.service";
 
@@ -21,6 +22,7 @@ export class WebhookController {
   constructor(
     private readonly configService: ConfigService,
     private readonly webhookService: WebhookService,
+    private readonly logger: PinoLogger,
   ) {}
 
   @Get("webhook")
@@ -41,26 +43,22 @@ export class WebhookController {
       expectedToken &&
       token === expectedToken
     ) {
-      console.log(
-        JSON.stringify({
-          event: "webhook.verify.success",
-          mode,
-          hasChallenge: Boolean(challenge),
-        }),
-      );
+      this.logger.info({
+        event: "webhook.verify.success",
+        mode,
+        hasChallenge: Boolean(challenge),
+      });
       const response = String(challenge ?? "");
       reply.type("text/plain").code(200).send(response);
       return;
     }
 
-    console.warn(
-      JSON.stringify({
-        event: "webhook.verify.failed",
-        mode,
-        tokenPresent: Boolean(token),
-        expectedTokenPresent: Boolean(expectedToken),
-      }),
-    );
+    this.logger.warn({
+      event: "webhook.verify.failed",
+      mode,
+      tokenPresent: Boolean(token),
+      expectedTokenPresent: Boolean(expectedToken),
+    });
 
     reply.type("text/plain").code(403).send("");
     return;
@@ -77,15 +75,16 @@ export class WebhookController {
       userAgent: request.headers["user-agent"],
     };
 
+    this.logger.info({ event: "webhook.received", requestId });
+
     void this.webhookService
       .handleWebhook(body, { ...metadata })
       .catch((error) => {
-        console.error(
-          JSON.stringify({
-            requestId,
-            error: error instanceof Error ? error.message : "Unknown error",
-          }),
-        );
+        this.logger.error({
+          event: "webhook.error",
+          requestId,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
       });
 
     return;
