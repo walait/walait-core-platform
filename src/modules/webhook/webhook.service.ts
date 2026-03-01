@@ -1,7 +1,8 @@
-import { Injectable } from "@nestjs/common";
-import { NormalizedEvent } from "@/modules/parser/parser.types";
 import { ParserService } from "@/modules/parser/parser.service";
+import { NormalizedEvent } from "@/modules/parser/parser.types";
 import { StorageService } from "@/modules/storage/storage.service";
+import { Injectable } from "@nestjs/common";
+import { WebhookEventRouter } from "./webhook-event-router.service";
 
 interface WebhookMetadata {
   requestId: string;
@@ -17,12 +18,10 @@ export class WebhookService {
   constructor(
     private readonly parserService: ParserService,
     private readonly storageService: StorageService,
+    private readonly eventRouter: WebhookEventRouter,
   ) {}
 
-  async handleWebhook(
-    payload: unknown,
-    metadata: WebhookMetadata,
-  ): Promise<void> {
+  async handleWebhook(payload: unknown, metadata: WebhookMetadata): Promise<void> {
     await this.storageService.appendRaw(payload, { ...metadata });
 
     const events = this.parserService.parse(payload);
@@ -37,6 +36,7 @@ export class WebhookService {
       }
 
       await this.storageService.appendEvent(event);
+      await this.eventRouter.route(event, { ...metadata });
     }
   }
 
@@ -62,11 +62,7 @@ export class WebhookService {
     }
   }
 
-  private logEvent(
-    requestId: string,
-    event: NormalizedEvent,
-    duplicate: boolean,
-  ): void {
+  private logEvent(requestId: string, event: NormalizedEvent, duplicate: boolean): void {
     const logPayload = {
       requestId,
       kind: event.kind,

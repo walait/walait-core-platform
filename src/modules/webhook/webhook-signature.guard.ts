@@ -1,8 +1,4 @@
-import {
-  type CanActivate,
-  type ExecutionContext,
-  Injectable,
-} from "@nestjs/common";
+import { type CanActivate, type ExecutionContext, Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type { FastifyRequest } from "fastify";
@@ -18,9 +14,7 @@ export class WebhookSignatureGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
     const signatureHeader = request.headers["x-hub-signature-256"];
-    const signature = Array.isArray(signatureHeader)
-      ? signatureHeader[0]
-      : signatureHeader;
+    const signature = Array.isArray(signatureHeader) ? signatureHeader[0] : signatureHeader;
     const contentType = request.headers["content-type"];
 
     const appSecret = this.configService.get<string>("whatsapp.appSecret");

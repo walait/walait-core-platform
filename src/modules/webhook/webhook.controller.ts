@@ -33,16 +33,9 @@ export class WebhookController {
     @Query("hub.verify_token") token?: string,
     @Query("hub.challenge") challenge?: string,
   ): void {
-    const expectedToken = this.configService.get<string>(
-      "whatsapp.verifyToken",
-    );
+    const expectedToken = this.configService.get<string>("whatsapp.verifyToken");
 
-    if (
-      mode === "subscribe" &&
-      token &&
-      expectedToken &&
-      token === expectedToken
-    ) {
+    if (mode === "subscribe" && token && expectedToken && token === expectedToken) {
       this.logger.info({
         event: "webhook.verify.success",
         mode,
@@ -79,15 +72,13 @@ export class WebhookController {
 
     this.logger.info({ event: "webhook.received", requestId });
 
-    void this.webhookService
-      .handleWebhook(body, { ...metadata })
-      .catch((error) => {
-        this.logger.error({
-          event: "webhook.error",
-          requestId,
-          error: error instanceof Error ? error.message : "Unknown error",
-        });
+    void this.webhookService.handleWebhook(body, { ...metadata }).catch((error) => {
+      this.logger.error({
+        event: "webhook.error",
+        requestId,
+        error: error instanceof Error ? error.message : "Unknown error",
       });
+    });
 
     return;
   }
