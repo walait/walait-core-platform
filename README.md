@@ -22,6 +22,7 @@ Modulos principales actuales:
 - `src/modules/identity`
 - `src/modules/organization`
 - `src/modules/taxes`
+- `src/modules/tenis` (MVP, no registrado por defecto)
 
 Apps/entrypoints:
 
@@ -159,4 +160,17 @@ Para quitar un modulo de una app:
 ## Convenciones
 
 - Imports internos con alias `@` (ver `vitest.config.ts`).
-- Entities bajo `src/modules/**/domain/model/*.entity.ts`.
+- Entities bajo `src/modules/**/domain/model/*.entity.ts` o `src/modules/**/entities/*.entity.ts`.
+
+## Documentacion Tenis
+
+Ver `docs/tenis/README.md`.
+
+## Bot registry
+
+Ver `docs/bot-registry.md`.
+
+## Scripts de seeds
+
+- `npm run seed:bot-registry`
+- `npm run seed:tenis-names`
