@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable, forwardRef } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Challenge } from "../entities/challenge.entity";
@@ -25,6 +25,7 @@ export class ChallengeService {
     private readonly limitsService: LimitsService,
     private readonly rankingService: RankingService,
     private readonly matchService: MatchService,
+    @Inject(forwardRef(() => ExpireChallengeJob))
     private readonly jobs: ExpireChallengeJob,
     private readonly whatsappClient: WhatsAppClient,
     private readonly auditService: AuditService,

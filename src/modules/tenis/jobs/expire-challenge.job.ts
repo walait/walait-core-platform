@@ -1,4 +1,11 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+  forwardRef,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Job, Queue, Worker } from "bullmq";
@@ -26,6 +33,7 @@ export class ExpireChallengeJob implements OnModuleInit, OnModuleDestroy {
     private readonly challengeRepository: Repository<Challenge>,
     @InjectRepository(Player)
     private readonly playerRepository: Repository<Player>,
+    @Inject(forwardRef(() => ChallengeService))
     private readonly challengeService: ChallengeService,
     private readonly whatsappClient: WhatsAppClient,
   ) {}
