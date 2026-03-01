@@ -28,6 +28,8 @@
     "typeorm:revert": "ts-node -r tsconfig-paths/register ./data-source.ts migration:revert",
     "typeorm": "typeorm-ts-node-commonjs",
     "seed": "ts-node -r tsconfig-paths/register src/seeds/seed.ts",
+    "seed:bot-registry": "ts-node -r tsconfig-paths/register src/seeds/seedBotRegistry.ts",
+    "seed:tenis-names": "ts-node -r tsconfig-paths/register src/seeds/backfillTenisNames.ts",
     "commit": "npx cz",
     "release": "standard-version",
     "releaseVersion": "./versionRelease.sh"
@@ -47,12 +49,14 @@
     "amqplib": "^0.10.8",
     "argon2": "^0.43.0",
     "axios": "^1.10.0",
+    "bullmq": "^5.70.1",
     "class-validator": "^0.14.2",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
     "easy-soap-request": "^5.6.1",
     "fast-xml-parser": "^5.2.5",
     "fastify": "^5.7.4",
+    "google-auth-library": "^9.15.1",
     "ioredis": "^5.6.1",
     "jsonwebtoken": "^9.0.2",
     "nestjs-pino": "^4.6.0",
@@ -96,8 +100,5 @@
       "commit-msg": "commitlint -e --verbose"
     }
   },
-  "trustedDependencies": [
-    "@nestjs/core",
-    "@swc/core"
-  ]
+  "trustedDependencies": ["@nestjs/core", "@swc/core"]
 }

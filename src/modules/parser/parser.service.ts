@@ -1,6 +1,7 @@
 import {
   NormalizedEvent,
   NormalizedEventKind,
+  NormalizedInteractive,
   NormalizedMessageType,
 } from "./parser.types";
 
@@ -27,9 +28,7 @@ export class ParserService {
           continue;
         }
 
-        const value = this.isRecord(change.value)
-          ? (change.value as UnknownRecord)
-          : undefined;
+        const value = this.isRecord(change.value) ? (change.value as UnknownRecord) : undefined;
 
         if (!value) {
           continue;
@@ -39,23 +38,15 @@ export class ParserService {
           ? (value.metadata as UnknownRecord)
           : undefined;
         const phoneNumberId =
-          typeof metadata?.phone_number_id === "string"
-            ? metadata.phone_number_id
-            : undefined;
+          typeof metadata?.phone_number_id === "string" ? metadata.phone_number_id : undefined;
 
         const contacts = Array.isArray(value.contacts) ? value.contacts : [];
-        const contact = this.isRecord(contacts[0])
-          ? (contacts[0] as UnknownRecord)
-          : undefined;
+        const contact = this.isRecord(contacts[0]) ? (contacts[0] as UnknownRecord) : undefined;
         const contactProfile = this.isRecord(contact?.profile)
           ? (contact?.profile as UnknownRecord)
           : undefined;
-        const fromName =
-          typeof contactProfile?.name === "string"
-            ? contactProfile.name
-            : undefined;
-        const fromWaId =
-          typeof contact?.wa_id === "string" ? contact.wa_id : undefined;
+        const fromName = typeof contactProfile?.name === "string" ? contactProfile.name : undefined;
+        const fromWaId = typeof contact?.wa_id === "string" ? contact.wa_id : undefined;
 
         const messages = Array.isArray(value.messages) ? value.messages : [];
         for (const message of messages) {
@@ -64,20 +55,20 @@ export class ParserService {
           }
 
           const messageType = this.parseMessageType(message.type);
-          const textBody = this.extractTextBody(message);
+          const interactive = this.extractInteractive(message);
+          const textBody = this.extractTextBody(message) ?? interactive?.title;
           const occurredAt = this.toIsoTimestamp(message.timestamp);
 
           events.push({
             kind: "incoming_message",
             occurredAt,
             phoneNumberId,
-            waMessageId:
-              typeof message.id === "string" ? message.id : undefined,
-            fromWaId:
-              typeof message.from === "string" ? message.from : fromWaId,
+            waMessageId: typeof message.id === "string" ? message.id : undefined,
+            fromWaId: typeof message.from === "string" ? message.from : fromWaId,
             fromName,
             messageType,
             text: textBody,
+            interactive,
             raw: message,
           });
         }
@@ -93,12 +84,8 @@ export class ParserService {
             occurredAt: this.toIsoTimestamp(status.timestamp),
             phoneNumberId,
             waMessageId: typeof status.id === "string" ? status.id : undefined,
-            fromWaId:
-              typeof status.recipient_id === "string"
-                ? status.recipient_id
-                : undefined,
-            status:
-              typeof status.status === "string" ? status.status : undefined,
+            fromWaId: typeof status.recipient_id === "string" ? status.recipient_id : undefined,
+            status: typeof status.status === "string" ? status.status : undefined,
             raw: status,
           });
         }
@@ -124,6 +111,40 @@ export class ParserService {
   private extractTextBody(message: UnknownRecord): string | undefined {
     const text = this.isRecord(message.text) ? message.text : undefined;
     return typeof text?.body === "string" ? text.body : undefined;
+  }
+
+  private extractInteractive(message: UnknownRecord): NormalizedInteractive | undefined {
+    const interactive = this.isRecord(message.interactive)
+      ? (message.interactive as UnknownRecord)
+      : undefined;
+    if (!interactive) {
+      return undefined;
+    }
+
+    const type = typeof interactive.type === "string" ? interactive.type : "unknown";
+    if (type === "button_reply") {
+      const reply = this.isRecord(interactive.button_reply)
+        ? (interactive.button_reply as UnknownRecord)
+        : undefined;
+      return {
+        type: "button",
+        id: typeof reply?.id === "string" ? reply.id : undefined,
+        title: typeof reply?.title === "string" ? reply.title : undefined,
+      };
+    }
+
+    if (type === "list_reply") {
+      const reply = this.isRecord(interactive.list_reply)
+        ? (interactive.list_reply as UnknownRecord)
+        : undefined;
+      return {
+        type: "list",
+        id: typeof reply?.id === "string" ? reply.id : undefined,
+        title: typeof reply?.title === "string" ? reply.title : undefined,
+      };
+    }
+
+    return { type: "unknown" };
   }
 
   private toIsoTimestamp(value: unknown): string {

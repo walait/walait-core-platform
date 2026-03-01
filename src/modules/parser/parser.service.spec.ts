@@ -1,36 +1,36 @@
-import { ParserService } from './parser.service';
+import { ParserService } from "./parser.service";
 
-describe('ParserService', () => {
+describe("ParserService", () => {
   const parser = new ParserService();
 
-  it('parses incoming text messages', () => {
+  it("parses incoming text messages", () => {
     const payload = {
-      object: 'whatsapp_business_account',
+      object: "whatsapp_business_account",
       entry: [
         {
-          id: '123456',
+          id: "123456",
           changes: [
             {
-              field: 'messages',
+              field: "messages",
               value: {
-                messaging_product: 'whatsapp',
+                messaging_product: "whatsapp",
                 metadata: {
-                  display_phone_number: '15551234567',
-                  phone_number_id: '987654',
+                  display_phone_number: "15551234567",
+                  phone_number_id: "987654",
                 },
                 contacts: [
                   {
-                    profile: { name: 'Jane Doe' },
-                    wa_id: '5491112345678',
+                    profile: { name: "Jane Doe" },
+                    wa_id: "5491112345678",
                   },
                 ],
                 messages: [
                   {
-                    from: '5491112345678',
-                    id: 'wamid.HBgMNTQ5MTExMjM0NTY3OA==',
-                    timestamp: '1710000000',
-                    type: 'text',
-                    text: { body: 'Hola' },
+                    from: "5491112345678",
+                    id: "wamid.HBgMNTQ5MTExMjM0NTY3OA==",
+                    timestamp: "1710000000",
+                    type: "text",
+                    text: { body: "Hola" },
                   },
                 ],
               },
@@ -45,37 +45,37 @@ describe('ParserService', () => {
     expect(events).toHaveLength(1);
     expect(events[0]).toEqual(
       expect.objectContaining({
-        kind: 'incoming_message',
-        phoneNumberId: '987654',
-        waMessageId: 'wamid.HBgMNTQ5MTExMjM0NTY3OA==',
-        fromWaId: '5491112345678',
-        fromName: 'Jane Doe',
-        messageType: 'text',
-        text: 'Hola',
+        kind: "incoming_message",
+        phoneNumberId: "987654",
+        waMessageId: "wamid.HBgMNTQ5MTExMjM0NTY3OA==",
+        fromWaId: "5491112345678",
+        fromName: "Jane Doe",
+        messageType: "text",
+        text: "Hola",
         occurredAt: new Date(1710000000 * 1000).toISOString(),
       }),
     );
   });
 
-  it('parses message statuses', () => {
+  it("parses message statuses", () => {
     const payload = {
-      object: 'whatsapp_business_account',
+      object: "whatsapp_business_account",
       entry: [
         {
-          id: '123456',
+          id: "123456",
           changes: [
             {
-              field: 'messages',
+              field: "messages",
               value: {
                 metadata: {
-                  phone_number_id: '987654',
+                  phone_number_id: "987654",
                 },
                 statuses: [
                   {
-                    id: 'wamid.status123',
-                    status: 'delivered',
+                    id: "wamid.status123",
+                    status: "delivered",
                     timestamp: 1710001000,
-                    recipient_id: '5491112345678',
+                    recipient_id: "5491112345678",
                   },
                 ],
               },
@@ -90,21 +90,66 @@ describe('ParserService', () => {
     expect(events).toHaveLength(1);
     expect(events[0]).toEqual(
       expect.objectContaining({
-        kind: 'message_status',
-        phoneNumberId: '987654',
-        waMessageId: 'wamid.status123',
-        fromWaId: '5491112345678',
-        status: 'delivered',
+        kind: "message_status",
+        phoneNumberId: "987654",
+        waMessageId: "wamid.status123",
+        fromWaId: "5491112345678",
+        status: "delivered",
         occurredAt: new Date(1710001000 * 1000).toISOString(),
       }),
     );
   });
 
-  it('returns unknown event when payload does not match', () => {
-    const payload = { foo: 'bar' };
+  it("returns unknown event when payload does not match", () => {
+    const payload = { foo: "bar" };
     const events = parser.parse(payload);
 
     expect(events).toHaveLength(1);
-    expect(events[0].kind).toBe('unknown');
+    expect(events[0].kind).toBe("unknown");
+  });
+
+  it("parses interactive button replies", () => {
+    const payload = {
+      entry: [
+        {
+          changes: [
+            {
+              value: {
+                metadata: { phone_number_id: "123" },
+                messages: [
+                  {
+                    id: "wamid.123",
+                    from: "5491112345678",
+                    timestamp: "1710002000",
+                    type: "interactive",
+                    interactive: {
+                      type: "button_reply",
+                      button_reply: {
+                        id: "challenge_accept:abc",
+                        title: "Confirmar",
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      ],
+    };
+
+    const events = parser.parse(payload);
+    expect(events).toHaveLength(1);
+    expect(events[0]).toEqual(
+      expect.objectContaining({
+        kind: "incoming_message",
+        messageType: "interactive",
+        interactive: {
+          type: "button",
+          id: "challenge_accept:abc",
+          title: "Confirmar",
+        },
+      }),
+    );
   });
 });
