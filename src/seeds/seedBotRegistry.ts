@@ -54,5 +54,9 @@ seedBotRegistry()
   })
   .catch((err) => {
     console.error("❌ Error during bot registry seed:", err);
-    AppDataSource.destroy();
+  })
+  .finally(() => {
+    if (AppDataSource.isInitialized) {
+      void AppDataSource.destroy();
+    }
   });
